@@ -36,8 +36,7 @@ double randomNormalDistribution(double min, double max){
     return sqrt(-2 * log(rand1)) * cos(2 * M_PI * rand2) * (max - min) + min;
 }
 
-double* psf(double* position, double orientation, double size){
-    double vec_out[2] = {0, 0};
+void psf(double* vec_out, double* position, double orientation, double size){
     double d = 0;
     switch (aberration)
     {
@@ -63,8 +62,7 @@ double* psf(double* position, double orientation, double size){
         break;
     default:
         break;
-    }
-    return vec_out;
+    };
 }
 
 double aberrationSize(double* position){
@@ -174,10 +172,10 @@ double* arrayToImage(double* arr){
 double* generate(double* input_data){
     double* input = arrayToImage(input_data);
     double* output = generateImageArray(2304, 1728, 3);
-    double* psf_pos;
     double position[2] = {0 ,0};
     double orientation = 0;
     double size = 0;
+    double psf_pos[2] = {0,0}; 
     printf("start \n");
     for(int y = y_min; y < y_max; y++){
         position[1] = y;
@@ -190,7 +188,8 @@ double* generate(double* input_data){
             orientation = aberrationOrientation(position);
             size = aberrationSize(position);
             for(int i = 0; i < samples; i++){
-                psf_pos = psf(position, orientation, size);
+                psf_pos[0] = 0.0; psf_pos[0] = 0.0;
+                psf(psf_pos, position, orientation, size);
                 nearbyPixels(psf_pos);
                 for(int j = 0; j < pixelList[0][0]; j++){
                     applyLightRay(output, pixelList[j+1][0], pixelList[j+1][1], rgb, pixelList[j+1][2]);
