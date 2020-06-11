@@ -1,7 +1,20 @@
 #include <stdio.h>
 #include <math.h>
 
-int samples = 1;
+
+static unsigned int g_seed;
+
+inline void fast_srand(int seed) {
+    g_seed = seed;
+}
+
+inline int fast_rand(void) {
+    g_seed = (214013*g_seed+2531011);
+    return (g_seed>>16)&0x7FFF;
+}
+
+
+int samples = 1000;
 double exposure = 1;
 double gain = 1;
 int aberration = 0; // coma = 0, astig_tan = 1, asti_sag = 2
@@ -18,25 +31,25 @@ double pixelList[5][3]; // p[0][0] = number of valid pixels. p[0<][:] = 1 to 4 p
 double reference[2] = {0, 1};
 double rgb[3] = {0, 0, 0};
 
-double dotProduct(double* u, double* v){
+inline double dotProduct(double* u, double* v){
     return u[0]*v[0] + u[1]*v[1];
 }
 
-double vectorLength(double* u){
+inline double vectorLength(double* u){
     return sqrt(pow(u[0], 2) + pow(u[1], 2));
 }
 
-double randomNumber(){
-    return (rand()/(double)RAND_MAX);
+inline double randomNumber(){
+    return (fast_rand()/(double)32767);
 }
 
-double randomNormalDistribution(double min, double max){
+inline double randomNormalDistribution(double min, double max){
     double rand1 = randomNumber();
     double rand2 = randomNumber();
     return sqrt(-2 * log(rand1)) * cos(2 * M_PI * rand2) * (max - min) + min;
 }
 
-void psf(double* vec_out, double* position, double orientation, double size){
+inline void psf(int aberration, double* vec_out, double* position, double orientation, double size){
     double d = 0;
     switch (aberration)
     {
@@ -65,13 +78,13 @@ void psf(double* vec_out, double* position, double orientation, double size){
     };
 }
 
-double aberrationSize(double* position){
+inline double aberrationSize(double* position, double* center){
     double vec[2] = {position[0] - center[0], position[1] - center[1]};
     double d = vectorLength(vec);
     return d/d_max * strength;
 }
 
-double aberrationOrientation(double* position){
+inline double aberrationOrientation(double* position, double* center){
     double vec[2] = {position[0] - center[0], position[1] - center[1]};
     double orientation = acos(dotProduct(reference, vec)/(vectorLength(reference)*vectorLength(vec)));
     if (position[0] < center[0]){
@@ -80,49 +93,7 @@ double aberrationOrientation(double* position){
     return orientation;
 }
 
-void nearbyPixels(double* position){
-    int pixels = 0;
-    double pixel[2] = {0, 0};
-    pixel[0] = floor(position[0]);
-    pixel[1] = floor(position[1]);
-    if (pixel[0] >= 0 && pixel[0] < width && pixel[1] >= 0 && pixel[1] < height){
-        pixels++;
-        double amount = 1 - fabs(position[0] - pixel[0]) * fabs(position[1] - pixel[1]);
-        pixelList[pixels][0] = pixel[0];
-        pixelList[pixels][1] = pixel[1];
-        pixelList[pixels][2] = amount;
-    }
-    pixel[0] = floor(position[0]);
-    pixel[1] = ceil(position[1]);
-    if (pixel[0] >= 0 && pixel[0] < width && pixel[1] >= 0 && pixel[1] < height){
-        pixels++;
-        double amount = 1 - fabs(position[0] - pixel[0]) * fabs(position[1] - pixel[1]);
-        pixelList[pixels][0] = pixel[0];
-        pixelList[pixels][1] = pixel[1];
-        pixelList[pixels][2] = amount;
-    }
-    pixel[0] = ceil(position[0]);
-    pixel[1] = floor(position[1]);
-    if (pixel[0] >= 0 && pixel[0] < width && pixel[1] >= 0 && pixel[1] < height){
-        pixels++;
-        double amount = 1 - fabs(position[0] - pixel[0]) * fabs(position[1] - pixel[1]);
-        pixelList[pixels][0] = pixel[0];
-        pixelList[pixels][1] = pixel[1];
-        pixelList[pixels][2] = amount;
-    }
-    pixel[0] = ceil(position[0]);
-    pixel[1] = ceil(position[1]);
-    if (pixel[0] >= 0 && pixel[0] < width && pixel[1] >= 0 && pixel[1] < height){
-        pixels++;
-        double amount = 1 - fabs(position[0] - pixel[0]) * fabs(position[1] - pixel[1]);
-        pixelList[pixels][0] = pixel[0];
-        pixelList[pixels][1] = pixel[1];
-        pixelList[pixels][2] = amount;
-    }
-    pixelList[0][0] = pixels;
-}
-
-double arrayValue(double* array , int x, int y, int ch){
+inline double arrayValue(double* array , int x, int y, int ch){
     return array[x*3 + y*width*3 + ch];
 }
 
@@ -133,12 +104,28 @@ void printRGB(double* array, int x, int y){
     printf("R: %f G: %f B: %f \n", r, g, b);
 }
 
-void applyLightRay(double* image, int x, int y, double* rgb, double amount){
-    for(int i = 0; i < 3; i++){
-        double ray = rgb[i] * amount * gain;
-        //printf("rgb: %f gain: %f amount: %f ray: %f \n", rgb[i], gain, amount, ray);
-        image[x*height*3 + y*3 + i] += ray;
+void applyLightRay(double* image, double* psf_pos, 
+                            double* rgb, 
+                            double gain, int width, int height){
+    int pixelX0 = floor(psf_pos[0]);
+    int pixelY0 = floor(psf_pos[1]);
+    //if(pixelX0+1>=width || pixelX0<0) return;
+    //if(pixelY0+1>=height || pixelY0<0) return;
+
+    for(int i = 0; i < 2; i++){
+        int pixelX = pixelX0+i;
+        if(pixelX > (width-1) || pixelX < 0) continue;
+        for(int j = 0; j < 2; j++){
+            int pixelY = pixelY0+j;
+            if(pixelY > (height-1) || pixelY < 0) continue;
+            double amount = 1 - fabs(psf_pos[0] - pixelX) * fabs(psf_pos[1] - pixelY);
+            for(int k = 0; k < 3; k++){
+                double ray = rgb[k] * amount * gain;
+                image[pixelX*height*3 + pixelY*3 + k] += ray;
+            }
+        }
     }
+
 }
 
 double* generateImageArray(int width, int height, int channels){
@@ -169,7 +156,11 @@ double* arrayToImage(double* arr){
     return input_image;
 }
 
+
+
 double* generate(double* input_data){
+    fast_srand(1);
+    
     double* input = arrayToImage(input_data);
     double* output = generateImageArray(2304, 1728, 3);
     double position[2] = {0 ,0};
@@ -177,23 +168,21 @@ double* generate(double* input_data){
     double size = 0;
     double psf_pos[2] = {0,0}; 
     printf("start \n");
-    for(int y = y_min; y < y_max; y++){
-        position[1] = y;
+    
+    for(int x = x_min; x < x_max; x++){
+        
+        position[0] = x;
         //printf("progress: %d \n", x);
-        for(int x = x_min; x < x_max; x++){
+        for(int y = y_min; y < y_max; y++){
             for(int i = 0; i < 3; i++){
                 rgb[i] = arrayValue(input, x, y, i);
             }
-            position[0] = x;
-            orientation = aberrationOrientation(position);
-            size = aberrationSize(position);
+            position[1] = y;
+            orientation = aberrationOrientation(position, center);
+            size = aberrationSize(position, center);
             for(int i = 0; i < samples; i++){
-                psf_pos[0] = 0.0; psf_pos[0] = 0.0;
-                psf(psf_pos, position, orientation, size);
-                nearbyPixels(psf_pos);
-                for(int j = 0; j < pixelList[0][0]; j++){
-                    applyLightRay(output, pixelList[j+1][0], pixelList[j+1][1], rgb, pixelList[j+1][2]);
-                }
+                psf(aberration, psf_pos, position, orientation, size);
+                applyLightRay(output, psf_pos, rgb, gain, width, height);
             }
         }
     }
