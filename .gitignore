@@ -1,0 +1,5 @@
+.vscode
+build
+*.pyd
+*.o
+python_to_c.c
