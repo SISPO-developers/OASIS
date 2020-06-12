@@ -40,7 +40,8 @@ inline double vectorLength(double* u){
 }
 
 inline double randomNumber(){
-    return (fast_rand()/(double)32767);
+    //return (fast_rand()/(double)32767);
+    return (rand()/(double)RAND_MAX);
 }
 
 inline double randomNormalDistribution(double min, double max){
@@ -156,10 +157,8 @@ double* arrayToImage(double* arr){
     return input_image;
 }
 
-
-
 double* generate(double* input_data){
-    fast_srand(1);
+    //fast_srand(1);
     
     double* input = arrayToImage(input_data);
     double* output = generateImageArray(2304, 1728, 3);
