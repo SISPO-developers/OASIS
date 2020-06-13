@@ -185,6 +185,21 @@ double* generate(double* input_data){
             }
         }
     }
+    float offset = 0.5;
+    float multiplier = 2;
+    for(int i = 0; i < 3; i++){
+        int x = center[0]-offset; int y = center[1]-offset;
+        output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i) * gain * samples * multiplier;
+
+        x = center[0]-offset; y = center[1]+offset;
+        output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i) * gain * samples * multiplier;
+
+        x = center[0]+offset; y = center[1]-offset;
+        output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i) * gain * samples * multiplier;
+
+        x = center[0]+offset; y = center[1]+offset;
+        output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i) * gain * samples * multiplier;
+    }
     printf("end \n");
     return output;
 }
