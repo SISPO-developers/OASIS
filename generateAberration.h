@@ -140,13 +140,13 @@ double* arrayToImage(double* arr){
     exposure = arr[1];
     gain = exposure/(samples*1000);
     aberration = arr[2];
-    strength = arr[3];
     x_min = arr[4];
     x_max = arr[5];
     y_min = arr[6];
     y_max = arr[7];
     width = arr[8];
     height = arr[9];
+    strength = arr[3] * width/2000;
     center[0] = floor((width + 1) / 2) + 0.5;
     center[1] = floor((height + 1) / 2) + 0.5;
     d_max = vectorLength(center);
@@ -161,7 +161,7 @@ double* generate(double* input_data){
     //fast_srand(1);
     
     double* input = arrayToImage(input_data);
-    double* output = generateImageArray(2304, 1728, 3);
+    double* output = generateImageArray(width, height, 3);
     double position[2] = {0 ,0};
     double orientation = 0;
     double size = 0;

@@ -18,7 +18,6 @@ class OpticalAberration:
     y_max = 1
     width = 1
     height = 1
-    use_exr = False
 
     def __init__(self):
         pass
@@ -51,12 +50,10 @@ class OpticalAberration:
     def read_image(cls, file):
         img_type = file.split('.')[1]
         if img_type == 'jpg' or img_type == 'jpeg' or img_type == 'png':
-            cls.use_exr = False
             img = Image.open(file)
             cls.input = list(img.getdata())
             cls.width, cls.height = img.size
         elif img_type == 'exr':
-            cls.use_exr = True
             exrFile = OpenEXR.InputFile(file)
             header = exrFile.header()
             dw = header['dataWindow']
@@ -73,7 +70,8 @@ class OpticalAberration:
 
     @ classmethod
     def write_image(cls, img_array, file):
-        if cls.use_exr == False:
+        img_type = file.split('.')[1]
+        if img_type == "jpg":
             img = Image.new('RGB', (cls.width, cls.height), (0, 0, 0))
             for i in range(0, cls.width):
                 for j in range(0, cls.height):
@@ -82,8 +80,7 @@ class OpticalAberration:
                         rgb[ch] = min([255, round(rgb[ch])])
                     img.putpixel((i, j), (int(rgb[0]), int(rgb[1]), int(rgb[2])))
             img.save(file)
-        else:
-            file_name = file.split('.')[0] + ".exr"
+        elif img_type == "exr":
             r_out = []
             g_out = []
             b_out = []
@@ -95,12 +92,14 @@ class OpticalAberration:
             data_r = array.array('f', r_out).tostring()
             data_g = array.array('f', g_out).tostring()
             data_b = array.array('f', b_out).tostring()
-            exr_out = OpenEXR.OutputFile(file_name, OpenEXR.Header(cls.width, cls.height))
+            exr_out = OpenEXR.OutputFile(file, OpenEXR.Header(cls.width, cls.height))
             exr_out.writePixels({'R': data_r, 'G': data_g, 'B': data_b})
+        else:
+            print("no valid file type specified.")
 
 
-input_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/inputs/c_1.exr'
-output_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/c_1_test.jpg'
+input_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/inputs/dots2.jpg'
+output_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/dots_out.exr'
 a = OpticalAberration()
 a.set_parameters(input_string, output_string, 200, 340, 'coma', 8, 0, 0, 0, 0)
 a.generate_aberration()
