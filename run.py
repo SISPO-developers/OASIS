@@ -1,8 +1,10 @@
 import python_to_c
+import distort_image
 import numpy as np
 import OpenEXR
 import Imath
 import array
+import cv2
 from PIL import Image
 
 class OpticalAberration:
@@ -26,6 +28,27 @@ class OpticalAberration:
     def generate_aberration(cls):
         output_img = python_to_c.pass_to_c(cls.input, cls.samples, cls.exposure, cls.aberration, cls.strength, cls.x_min, cls.x_max, cls.y_min, cls.y_max, cls.width, cls.height)
         cls.write_image(output_img, cls.output)
+
+    @classmethod
+    def get_camera_matrix(cls, fx, fy, cx, cy):
+        cm = np.zeros((3, 3))
+        cm[0][0] = fx
+        cm[1][1] = fy
+        cm[0][2] = cx
+        cm[1][2] = cy
+        cm[2][2] = 1
+        return cm
+
+    @classmethod
+    def get_dist_coeff(cls, k1, k2, p1, p2, k3):
+        dist_invert = -1
+        dc = np.zeros(5)
+        dc[0] = k1 * dist_invert
+        dc[1] = k2 * dist_invert
+        dc[2] = p1 * dist_invert
+        dc[3] = p2 * dist_invert
+        dc[4] = k3 * dist_invert
+        return dc
 
     @classmethod
     def set_parameters(cls, in_file, out_file, samples, exp, aberration, strength, x_min, x_max, y_min, y_max):
@@ -69,6 +92,12 @@ class OpticalAberration:
                     cls.input.append(cc[j][i])
 
     @ classmethod
+    def generate_distortion(cls, input_file, output_file, fx, fy, cx, cy, k1, k2, p1, p2, k3):
+        cam_mat = cls.get_camera_matrix(fx, fy, cx, cy)
+        dist_coeff = cls.get_dist_coeff(k1, k2, p1, p2, k3)
+        distort_image.distort(input_file, output_file, cam_mat, dist_coeff)
+
+    @ classmethod
     def write_image(cls, img_array, file):
         img_type = file.split('.')[1]
         if img_type == "jpg":
@@ -99,7 +128,8 @@ class OpticalAberration:
 
 
 input_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/inputs/dots2.jpg'
-output_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/dots_out.exr'
+output_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/test_dist.jpg'
 a = OpticalAberration()
-a.set_parameters(input_string, output_string, 200, 340, 'coma', 8, 0, 0, 0, 0)
-a.generate_aberration()
+#a.set_parameters(input_string, output_string, 200, 340, 'coma', 8, 0, 0, 0, 0)
+#a.generate_aberration()
+a.generate_distortion(input_string, output_string, 3034.59, 3034.59, 1501.63, 1973.7, 0.0349199, -0.08665, -0.000251559, -0.000103521, 0.0861223)
