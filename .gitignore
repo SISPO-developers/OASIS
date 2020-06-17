@@ -1,6 +1,0 @@
-.vscode
-build
-*.pyd
-*.pyc
-*.o
-python_to_c.c
