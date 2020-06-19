@@ -31,17 +31,18 @@ cdef extern from "generateAberration.h":
 
 cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, x_min, x_max, y_min, y_max, width, height):
     input_data = parameters_to_array(image_arr, samples, exposure, aberration, strength, x_min, x_max, y_min, y_max, width, height)
+    del image_arr[:]
+    del image_arr
     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(input_data, dtype=np.float64)
+    del input_data[:]
+    del input_data
     output_data = generate(<double*> input.data)
-    output_img = []
+    del input
+    output_img = np.zeros((width, height, 3))
     for x in range(0, width):
-        col = []
         for y in range(0, height):
-            pixel = []
             for ch in range(0, 3):
-                pixel.append(output_data[x*height*3 + y*3 + ch])
-            col.append(pixel)
-        output_img.append(col)
+                output_img[x][y][ch] = output_data[x*height*3 + y*3 + ch]
     return output_img
 
 

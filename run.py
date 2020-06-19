@@ -9,7 +9,7 @@ import scipy.ndimage.interpolation
 from PIL import Image
 
 class OpticalAberration:
-    input = []
+    input = ''
     output = ''
     samples = 1
     exposure = 1
@@ -29,10 +29,11 @@ class OpticalAberration:
 
     @classmethod
     def generate_aberration(cls):
-        cls.output_img = python_to_c.pass_to_c(cls.input, cls.samples, cls.exposure, cls.aberration, cls.strength, cls.x_min, cls.x_max, cls.y_min, cls.y_max, cls.width, cls.height)
+        input = cls.read_image(cls.input)
         if cls.chromatic_aberration > 0:
-            cls.generate_chromatic_aberration()
-        cls.write_image(cls.output_img, cls.output)
+            input = cls.generate_chromatic_aberration(input)
+        output_img = python_to_c.pass_to_c(input, cls.samples, cls.exposure, cls.aberration, cls.strength, cls.x_min, cls.x_max, cls.y_min, cls.y_max, cls.width, cls.height)
+        cls.write_image(output_img, cls.output)
 
     @classmethod
     def get_camera_matrix(cls, fx, fy, cx, cy):
@@ -57,31 +58,32 @@ class OpticalAberration:
 
     @classmethod
     def set_parameters(cls, in_file, out_file, samples, exp, aberration, strength, x_min, x_max, y_min, y_max, chrom_ab):
-        cls.read_image(in_file)
+        #cls.read_image(in_file)
+        cls.input = in_file
         cls.output = out_file
         cls.samples = samples
         cls.exposure = exp
         cls.aberration = aberration
         cls.strength = strength
         cls.chromatic_aberration = chrom_ab
-        if x_max - x_min < 1 or y_max - y_min < 1:
-            cls.x_min = 0
-            cls.x_max = cls.width
-            cls.y_min = 0
-            cls.y_max = cls.height
-        else:
-            cls.x_min = x_min
-            cls.x_max = x_max
-            cls.y_min = y_min
-            cls.y_max = y_max
+        cls.x_min = x_min
+        cls.x_max = x_max
+        cls.y_min = y_min
+        cls.y_max = y_max
 
     @classmethod
     def read_image(cls, file):
         img_type = file.split('.')[1]
         if img_type == 'jpg' or img_type == 'jpeg' or img_type == 'png':
             img = Image.open(file)
-            cls.input = list(img.getdata())
+            input = list(img.getdata())
             cls.width, cls.height = img.size
+            if cls.x_max - cls.x_min < 1 or cls.y_max - cls.y_min < 1:
+                cls.x_min = 0
+                cls.x_max = cls.width
+                cls.y_min = 0
+                cls.y_max = cls.height
+            return input
         elif img_type == 'exr':
             exrFile = OpenEXR.InputFile(file)
             header = exrFile.header()
@@ -93,20 +95,28 @@ class OpticalAberration:
             cc_b = np.fromstring(exrFile.channel('B', pt), dtype=np.float32)
             cc_r.shape = cc_g.shape = cc_b.shape = (cls.width, cls.height)
             cc = np.dstack((cc_r, cc_g, cc_b))
+            input = [[0, 0, 0] for i in range(cls.width * cls.height)]
             for j in range(0, cls.width):
                 for i in range(0, cls.height):
-                    cls.input.append(cc[j][i])
+                    input[j*cls.width + i] = cc[j][i]
+                    #input.append(cc[j][i])
+            if cls.x_max - cls.x_min < 1 or cls.y_max - cls.y_min < 1:
+                cls.x_min = 0
+                cls.x_max = cls.width
+                cls.y_min = 0
+                cls.y_max = cls.height
+            return input
 
     @classmethod
-    def generate_chromatic_aberration(cls):
+    def generate_chromatic_aberration(cls, input):
         img_r = np.zeros((cls.width, cls.height))
         img_g = np.zeros((cls.width, cls.height))
         img_b = np.zeros((cls.width, cls.height))
         for x in range(0, cls.width):
             for y in range(0, cls.height):
-                img_r[x][y] = cls.output_img[x][y][0]
-                img_g[x][y] = cls.output_img[x][y][1]
-                img_b[x][y] = cls.output_img[x][y][2]
+                img_r[x][y] = input[y*cls.width + x][0]
+                img_g[x][y] = input[y*cls.width + x][1]
+                img_b[x][y] = input[y*cls.width + x][2]
         strength = cls.chromatic_aberration/1000
         img_r = scipy.ndimage.interpolation.zoom(img_r, 1-strength)
         img_b = scipy.ndimage.interpolation.zoom(img_b, 1+strength)
@@ -114,6 +124,10 @@ class OpticalAberration:
         h_r = len(img_r[0])
         w_b = len(img_b)
         h_b = len(img_b[0])
+        #cls.input = np.zeros((cls.width * cls.height, 3))
+        del input[:]
+        del input
+        input = [[0, 0, 0] for i in range(cls.width * cls.height)]
         for x in range(0, cls.width):
             for y in range(0, cls.height):
                 x_r = int(round((w_r-cls.width)/2 + x))
@@ -121,10 +135,12 @@ class OpticalAberration:
                 x_b = int(round((w_b-cls.width)/2 + x))
                 y_b = int(round((h_b-cls.height)/2 + y))
                 if 0 <= x_r < w_r and 0 <= y_r < h_r:
-                    cls.output_img[x][y][0] = img_r[x_r][y_r]
+                    input[y*cls.width + x][0] = img_r[x_r][y_r]
                 else:
-                    cls.output_img[x][y][0] = 0
-                cls.output_img[x][y][2] = img_b[x_b][y_b]
+                    input[y*cls.width + x][0] = 0
+                input[y*cls.width + x][1] = img_g[x][y]
+                input[y*cls.width + x][2] = img_b[x_b][y_b]
+        return input
 
     @ classmethod
     def generate_distortion(cls, input_file, output_file, fx, fy, cx, cy, k1, k2, p1, p2, k3):
@@ -162,9 +178,9 @@ class OpticalAberration:
             print("no valid file type specified.")
 
 
-input_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/inputs/comet.jpg'
-output_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/test_chrom6.jpg'
+input_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/inputs/c_1.exr'
+output_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/test_error.exr'
 a = OpticalAberration()
-a.set_parameters(input_string, output_string, 200, 340, 'coma', 4, 0, 0, 0, 0, 3)
+a.set_parameters(input_string, output_string, 1, 340, 'coma', 0, 0, 0, 0, 0, 3)
 a.generate_aberration()
 #a.generate_distortion(input_string, output_string, 3034.59, 3034.59, 1501.63, 1973.7, 0.0349199, -0.08665, -0.000251559, -0.000103521, 0.0861223)
