@@ -1,9 +1,10 @@
 import numpy as np
 cimport numpy as cnp  #cython requires special numpy array
 
+cdef extern from "generateAberration.h":
+    double* generate(double* x, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int x_min, int x_max, int y_min, int y_max, int width, int height)
 
-def parameters_to_array(image_arr, samples, exposure, aberration, strength, x_min, x_max, y_min, y_max, width, height):
-    input_arr = []
+cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height):
     aberration_int = 0
     if aberration == 'coma':
         aberration_int = 0
@@ -11,38 +12,13 @@ def parameters_to_array(image_arr, samples, exposure, aberration, strength, x_mi
         aberration_int = 1
     elif aberration == 'astigmatism_sagittal':
         aberration_int = 2
-    input_arr.append(samples)
-    input_arr.append(exposure)
-    input_arr.append(aberration_int)
-    input_arr.append(strength)
-    input_arr.append(x_min)
-    input_arr.append(x_max)
-    input_arr.append(y_min)
-    input_arr.append(y_max)
-    input_arr.append(width)
-    input_arr.append(height)
-    for i in range(0, width*height):
-        for j in range(0, 3):
-            input_arr.append(image_arr[i][j])
-    return input_arr
-
-cdef extern from "generateAberration.h":
-    double* generate(double* x)
-
-cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, x_min, x_max, y_min, y_max, width, height):
-    input_data = parameters_to_array(image_arr, samples, exposure, aberration, strength, x_min, x_max, y_min, y_max, width, height)
-    del image_arr[:]
-    del image_arr
-    cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(input_data, dtype=np.float64)
-    del input_data[:]
-    del input_data
-    output_data = generate(<double*> input.data)
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)
+    output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height)
     del input
-    output_img = np.zeros((width, height, 3))
     for x in range(0, width):
         for y in range(0, height):
             for ch in range(0, 3):
-                output_img[x][y][ch] = output_data[x*height*3 + y*3 + ch]
-    return output_img
+                image_arr[x*height*3 + y*3 + ch] = output_data[x*height*3 + y*3 + ch]
+    return image_arr
 
 
