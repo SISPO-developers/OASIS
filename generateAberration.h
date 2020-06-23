@@ -145,5 +145,24 @@ double* generate(double* input, int samples, double exposure, int aberration, do
         output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i, width) * gain * samples * multiplier;
     }
     printf("end \n");
+
+    double amount = 0;
+    if (darkCurrent > 0){
+        for (int i = 0; i < width*height*3; i++){
+            amount = pow(randomNumber(), 2) * darkCurrent / 300;
+            output[i] += amount;
+        }
+    }
+
+    if (readoutNoise > 0){
+        for (int i = 0; i < width*height*3; i++){
+            amount = randomNormalDistribution(-0.5, 0.5) * readoutNoise / 300;
+            output[i] += amount;
+            if (output[i] < 0){
+                output[i] = 0;
+            }
+        }
+    }
+
     return output;
 }
