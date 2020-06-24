@@ -100,6 +100,21 @@ double* generateImageArray(int width, int height, int channels){
 }
 
 double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int x_min, int x_max, int y_min, int y_max, int width, int height){
+    switch (aberration)
+    {
+    case 0:
+        printf("Applying coma:   0 %%");
+        break;
+    case 1:
+        printf("Applying tangential astigmatism:   0 %%");
+        break;
+    case 2:
+        printf("Applying sagittal astigmatism:   0 %%");
+        break;
+    default:
+        printf("Render progress:   0 %%");
+        break;
+    };
     double gain = exposure/(samples*10);
     strength = strength * width/2000;
     double* output = generateImageArray(width, height, 3);
@@ -110,12 +125,11 @@ double* generate(double* input, int samples, double exposure, int aberration, do
     double rgb[3] = {0, 0, 0};
     double center[2] = {floor((width + 1) / 2) + 0.5, floor((height + 1) / 2) + 0.5};
     double d_max = vectorLength(center);
-    printf("start \n");
     
     for(int x = x_min; x < x_max; x++){
         
         position[0] = x;
-        //printf("progress: %d \n", x);
+        printf("\b\b\b\b\b%3d %%", (100*(x-x_min)/(x_max-x_min)+1) );
         for(int y = y_min; y < y_max; y++){
             for(int i = 0; i < 3; i++){
                 rgb[i] = arrayValue(input, x, y, i, width);
@@ -129,6 +143,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
             }
         }
     }
+    printf("\n");
     float offset = 0.5;
     float multiplier = 2;
     for(int i = 0; i < 3; i++){
@@ -144,7 +159,6 @@ double* generate(double* input, int samples, double exposure, int aberration, do
         x = center[0]+offset; y = center[1]+offset;
         output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i, width) * gain * samples * multiplier;
     }
-    printf("end \n");
 
     double amount = 0;
     if (darkCurrent > 0){
@@ -152,6 +166,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
             amount = pow(randomNumber(), 2) * darkCurrent / 300;
             output[i] += amount;
         }
+        printf("Dark current noise added.\n");
     }
 
     if (readoutNoise > 0){
@@ -162,6 +177,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
                 output[i] = 0;
             }
         }
+        printf("Readout noise added.\n");
     }
 
     return output;

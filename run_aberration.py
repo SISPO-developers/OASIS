@@ -1,5 +1,8 @@
 import python_to_c
 import distort_image
+import sys
+import math
+import time
 import numpy as np
 import OpenEXR
 import Imath
@@ -14,7 +17,24 @@ class OpticalAberration:
         pass
 
     @classmethod
+    def time_to_string(cls, time):
+        hours = math.floor(time/(1000*60*60))
+        minutes = math.floor(time/(1000*60)) - hours*60
+        seconds = math.floor(time/1000) - minutes*60 - hours*60*60
+        h_str = str(hours)
+        m_str = str(minutes)
+        s_str = str(seconds)
+        if hours < 10:
+            h_str = "0" + h_str
+        if minutes < 10:
+            m_str = "0" + m_str
+        if seconds < 10:
+            s_str = "0" + s_str
+        return h_str + ":" + m_str + ":" + s_str		
+
+    @classmethod
     def generate_aberration(cls, in_string, out_string, samples, exposure, aberration, size, ca_size, dark_noise, read_noise, x_min, x_max, y_min, y_max):
+        start = int(round(time.time() * 1000))
         dimensions = [0, 0]
         render_dimensions = [x_min, x_max, y_min, y_max]
         input = cls.read_image(in_string, dimensions, render_dimensions)
@@ -28,6 +48,9 @@ class OpticalAberration:
             cls.generate_chromatic_aberration(input, ca_size, width, height)
         output_img = python_to_c.pass_to_c(input, samples, exposure, aberration, size, dark_noise, read_noise, x_min, x_max, y_min, y_max, width, height)
         cls.write_image(output_img, out_string, width, height)
+        end = int(round(time.time() * 1000)) - start
+        total_str = cls.time_to_string(end)
+        print("Total time: " + total_str)
 
     @classmethod
     def get_camera_matrix(cls, fx, fy, cx, cy):
@@ -52,6 +75,7 @@ class OpticalAberration:
 
     @classmethod
     def read_image(cls, file, dimensions, render_dimensions):
+        sys.stdout.write("Reading file:   0 %")
         input = []
         exr_in = 0
         img_type = file.split('.')[1]
@@ -67,9 +91,9 @@ class OpticalAberration:
             dw = header['dataWindow']
             pt = Imath.PixelType(Imath.PixelType.FLOAT)
             width, height = (dw.max.x - dw.min.x + 1, dw.max.y - dw.min.y + 1)
-            cc_r = np.fromstring(exrFile.channel('R', pt), dtype=np.float32)
-            cc_g = np.fromstring(exrFile.channel('G', pt), dtype=np.float32)
-            cc_b = np.fromstring(exrFile.channel('B', pt), dtype=np.float32)
+            cc_r = np.frombuffer(exrFile.channel('R', pt), dtype=np.float32)
+            cc_g = np.frombuffer(exrFile.channel('G', pt), dtype=np.float32)
+            cc_b = np.frombuffer(exrFile.channel('B', pt), dtype=np.float32)
             cc_r.shape = cc_g.shape = cc_b.shape = (width, height)
             cc = np.dstack((cc_r, cc_g, cc_b))
             input = [[0, 0, 0] for i in range(width * height)]
@@ -82,6 +106,8 @@ class OpticalAberration:
             del cc_b
         input_1d = [0 for i in range(width * height * 3)]
         for i in range(0, width):
+            sys.stdout.write("\r")
+            sys.stdout.write("Reading file:\t" + str(round(i/width*100)) + " %")
             for j in range(0, height):
                 for k in range(0, 3):
                     if exr_in == 0:
@@ -97,6 +123,7 @@ class OpticalAberration:
             render_dimensions[3] = height
         dimensions[0] = width
         dimensions[1] = height
+        print("")
         return input_1d
 
     @classmethod
@@ -118,10 +145,13 @@ class OpticalAberration:
 
     @classmethod
     def generate_chromatic_aberration(cls, input, amount, width, height):
+        sys.stdout.write("Applying chromatic aberration:   0 %")
         img_r = np.zeros((width, height))
         img_g = np.zeros((width, height))
         img_b = np.zeros((width, height))
         for x in range(0, width):
+            sys.stdout.write("\r")
+            sys.stdout.write("Applying chromatic aberration:\t" + str(round(x/width*50)) + " %")
             for y in range(0, height):
                 img_r[x][y] = input[y*width*3 + x*3 + 0]
                 img_g[x][y] = input[y*width*3 + x*3 + 1]
@@ -134,6 +164,8 @@ class OpticalAberration:
         w_b = len(img_b)
         h_b = len(img_b[0])
         for x in range(0, width):
+            sys.stdout.write("\r")
+            sys.stdout.write("Applying chromatic aberration:\t" + str(round(x/width*50 + 50)) + " %")
             for y in range(0, height):
                 x_r = int(round((w_r-width)/2 + x))
                 y_r = int(round((h_r-height)/2 + y))
@@ -148,6 +180,7 @@ class OpticalAberration:
         del img_r
         del img_g
         del img_b
+        print("")
 
     @ classmethod
     def generate_distortion(cls, input_file, output_file, fx, fy, cx, cy, k1, k2, p1, p2, k3):
@@ -157,10 +190,13 @@ class OpticalAberration:
 
     @ classmethod
     def write_image(cls, img_array, file, width, height):
+        sys.stdout.write("Writing file:   0 %")
         img_type = file.split('.')[1]
         if img_type == "jpg":
             img = Image.new('RGB', (width, height), (0, 0, 0))
             for i in range(0, width):
+                sys.stdout.write("\r")
+                sys.stdout.write("Writing file:\t" + str(round(i/width*100)) + " %")
                 for j in range(0, height):
                     ch_r = round(cls.linear_to_sRGB(img_array[i*height*3 + j*3 + 0]))
                     ch_g = round(cls.linear_to_sRGB(img_array[i*height*3 + j*3 + 1]))
@@ -172,21 +208,17 @@ class OpticalAberration:
             g_out = []
             b_out = []
             for i in range(0, height):
+                sys.stdout.write("\r")
+                sys.stdout.write("Writing file:\t" + str(round(i/height*100)) + " %")
                 for j in range(0, width):
                     r_out.append(img_array[j*height*3 + i*3 + 0])
                     g_out.append(img_array[j*height*3 + i*3 + 1])
                     b_out.append(img_array[j*height*3 + i*3 + 2])
-            data_r = array.array('f', r_out).tostring()
-            data_g = array.array('f', g_out).tostring()
-            data_b = array.array('f', b_out).tostring()
+            data_r = array.array('f', r_out).tobytes()
+            data_g = array.array('f', g_out).tobytes()
+            data_b = array.array('f', b_out).tobytes()
             exr_out = OpenEXR.OutputFile(file, OpenEXR.Header(width, height))
             exr_out.writePixels({'R': data_r, 'G': data_g, 'B': data_b})
         else:
             print("no valid file type specified.")
-
-
-input_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/inputs/c_1.exr'
-output_string = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/test_comet.exr'
-a = OpticalAberration()
-a.generate_aberration(input_string, output_string, 50, 3.5, 'coma', 4, 0, 0, 0, 0, 0, 0, 0)
-#a.generate_distortion(input_string, output_string, 3034.59, 3034.59, 1501.63, 1973.7, 0.0349199, -0.08665, -0.000251559, -0.000103521, 0.0861223)
+        print("")
