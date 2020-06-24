@@ -1690,7 +1690,7 @@ static PyTypeObject *__pyx_ptype_5numpy_ufunc = 0;
 static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, char *, char *, int *); /*proto*/
 
 /* Module declarations from 'python_to_c' */
-static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_float64_t = { "float64_t", NULL, sizeof(__pyx_t_5numpy_float64_t), { 0 }, 0, 'R', 0, 0 };
 #define __Pyx_MODULE_NAME "python_to_c"
 extern int __pyx_module_is_main_python_to_c;
@@ -1724,6 +1724,7 @@ static const char __pyx_k_strength[] = "strength";
 static const char __pyx_k_image_arr[] = "image_arr";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_aberration[] = "aberration";
+static const char __pyx_k_shot_noise[] = "shot_noise";
 static const char __pyx_k_ImportError[] = "ImportError";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
 static const char __pyx_k_dark_current[] = "dark_current";
@@ -1765,6 +1766,7 @@ static PyObject *__pyx_kp_s_numpy_core_umath_failed_to_impor;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_readout_noise;
 static PyObject *__pyx_n_s_samples;
+static PyObject *__pyx_n_s_shot_noise;
 static PyObject *__pyx_n_s_strength;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
@@ -1773,7 +1775,7 @@ static PyObject *__pyx_n_s_x_max;
 static PyObject *__pyx_n_s_x_min;
 static PyObject *__pyx_n_s_y_max;
 static PyObject *__pyx_n_s_y_min;
-static PyObject *__pyx_pf_11python_to_c_pass_to_c(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_image_arr, PyObject *__pyx_v_samples, PyObject *__pyx_v_exposure, PyObject *__pyx_v_aberration, PyObject *__pyx_v_strength, PyObject *__pyx_v_dark_current, PyObject *__pyx_v_readout_noise, PyObject *__pyx_v_x_min, PyObject *__pyx_v_x_max, PyObject *__pyx_v_y_min, PyObject *__pyx_v_y_max, PyObject *__pyx_v_width, PyObject *__pyx_v_height); /* proto */
+static PyObject *__pyx_pf_11python_to_c_pass_to_c(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_image_arr, PyObject *__pyx_v_samples, PyObject *__pyx_v_exposure, PyObject *__pyx_v_aberration, PyObject *__pyx_v_strength, PyObject *__pyx_v_dark_current, PyObject *__pyx_v_readout_noise, PyObject *__pyx_v_shot_noise, PyObject *__pyx_v_x_min, PyObject *__pyx_v_x_max, PyObject *__pyx_v_y_min, PyObject *__pyx_v_y_max, PyObject *__pyx_v_width, PyObject *__pyx_v_height); /* proto */
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_3;
 static PyObject *__pyx_tuple_;
@@ -1784,15 +1786,15 @@ static PyObject *__pyx_tuple__5;
 /* Late includes */
 
 /* "python_to_c.pyx":7
- *     double* generate(double* x, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int x_min, int x_max, int y_min, int y_max, int width, int height)
+ *     double* generate(double* x, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, int width, int height)
  * 
- * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height):             # <<<<<<<<<<<<<<
+ * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height):             # <<<<<<<<<<<<<<
  *     aberration_int = 0
  *     if aberration == 'coma':
  */
 
 static PyObject *__pyx_pw_11python_to_c_1pass_to_c(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, PyObject *__pyx_v_samples, PyObject *__pyx_v_exposure, PyObject *__pyx_v_aberration, PyObject *__pyx_v_strength, PyObject *__pyx_v_dark_current, PyObject *__pyx_v_readout_noise, PyObject *__pyx_v_x_min, PyObject *__pyx_v_x_max, PyObject *__pyx_v_y_min, PyObject *__pyx_v_y_max, PyObject *__pyx_v_width, PyObject *__pyx_v_height, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, PyObject *__pyx_v_samples, PyObject *__pyx_v_exposure, PyObject *__pyx_v_aberration, PyObject *__pyx_v_strength, PyObject *__pyx_v_dark_current, PyObject *__pyx_v_readout_noise, PyObject *__pyx_v_shot_noise, PyObject *__pyx_v_x_min, PyObject *__pyx_v_x_max, PyObject *__pyx_v_y_min, PyObject *__pyx_v_y_max, PyObject *__pyx_v_width, PyObject *__pyx_v_height, CYTHON_UNUSED int __pyx_skip_dispatch) {
   long __pyx_v_aberration_int;
   PyArrayObject *__pyx_v_input = 0;
   double *__pyx_v_output_data;
@@ -1821,13 +1823,14 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   int __pyx_t_16;
   int __pyx_t_17;
   int __pyx_t_18;
-  Py_ssize_t __pyx_t_19;
-  PyObject *(*__pyx_t_20)(PyObject *);
-  Py_ssize_t __pyx_t_21;
-  PyObject *(*__pyx_t_22)(PyObject *);
-  long __pyx_t_23;
-  Py_ssize_t __pyx_t_24;
-  PyObject *__pyx_t_25 = NULL;
+  int __pyx_t_19;
+  Py_ssize_t __pyx_t_20;
+  PyObject *(*__pyx_t_21)(PyObject *);
+  Py_ssize_t __pyx_t_22;
+  PyObject *(*__pyx_t_23)(PyObject *);
+  long __pyx_t_24;
+  Py_ssize_t __pyx_t_25;
+  PyObject *__pyx_t_26 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -1839,7 +1842,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
 
   /* "python_to_c.pyx":8
  * 
- * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height):
+ * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height):
  *     aberration_int = 0             # <<<<<<<<<<<<<<
  *     if aberration == 'coma':
  *         aberration_int = 0
@@ -1847,7 +1850,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   __pyx_v_aberration_int = 0;
 
   /* "python_to_c.pyx":9
- * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height):
+ * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height):
  *     aberration_int = 0
  *     if aberration == 'coma':             # <<<<<<<<<<<<<<
  *         aberration_int = 0
@@ -1866,7 +1869,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
     __pyx_v_aberration_int = 0;
 
     /* "python_to_c.pyx":9
- * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height):
+ * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height):
  *     aberration_int = 0
  *     if aberration == 'coma':             # <<<<<<<<<<<<<<
  *         aberration_int = 0
@@ -1919,7 +1922,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
  *     elif aberration == 'astigmatism_sagittal':
  *         aberration_int = 2             # <<<<<<<<<<<<<<
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)
- *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height)
+ *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height)
  */
     __pyx_v_aberration_int = 2;
 
@@ -1937,7 +1940,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
  *     elif aberration == 'astigmatism_sagittal':
  *         aberration_int = 2
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)             # <<<<<<<<<<<<<<
- *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height)
+ *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height)
  *     del input
  */
   __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
@@ -1981,7 +1984,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   /* "python_to_c.pyx":16
  *         aberration_int = 2
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)
- *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height)             # <<<<<<<<<<<<<<
+ *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height)             # <<<<<<<<<<<<<<
  *     del input
  *     for x in range(0, width):
  */
@@ -1990,17 +1993,18 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   __pyx_t_10 = __pyx_PyFloat_AsDouble(__pyx_v_strength); if (unlikely((__pyx_t_10 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
   __pyx_t_11 = __pyx_PyFloat_AsDouble(__pyx_v_dark_current); if (unlikely((__pyx_t_11 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
   __pyx_t_12 = __pyx_PyFloat_AsDouble(__pyx_v_readout_noise); if (unlikely((__pyx_t_12 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
-  __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_v_x_min); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
-  __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_v_x_max); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
-  __pyx_t_15 = __Pyx_PyInt_As_int(__pyx_v_y_min); if (unlikely((__pyx_t_15 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
-  __pyx_t_16 = __Pyx_PyInt_As_int(__pyx_v_y_max); if (unlikely((__pyx_t_16 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
-  __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_v_width); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
-  __pyx_t_18 = __Pyx_PyInt_As_int(__pyx_v_height); if (unlikely((__pyx_t_18 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
-  __pyx_v_output_data = generate(((double *)__pyx_v_input->data), __pyx_t_8, __pyx_t_9, __pyx_v_aberration_int, __pyx_t_10, __pyx_t_11, __pyx_t_12, __pyx_t_13, __pyx_t_14, __pyx_t_15, __pyx_t_16, __pyx_t_17, __pyx_t_18);
+  __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_v_shot_noise); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_v_x_min); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_15 = __Pyx_PyInt_As_int(__pyx_v_x_max); if (unlikely((__pyx_t_15 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyInt_As_int(__pyx_v_y_min); if (unlikely((__pyx_t_16 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_v_y_max); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_18 = __Pyx_PyInt_As_int(__pyx_v_width); if (unlikely((__pyx_t_18 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_19 = __Pyx_PyInt_As_int(__pyx_v_height); if (unlikely((__pyx_t_19 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_v_output_data = generate(((double *)__pyx_v_input->data), __pyx_t_8, __pyx_t_9, __pyx_v_aberration_int, __pyx_t_10, __pyx_t_11, __pyx_t_12, __pyx_t_13, __pyx_t_14, __pyx_t_15, __pyx_t_16, __pyx_t_17, __pyx_t_18, __pyx_t_19);
 
   /* "python_to_c.pyx":17
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)
- *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height)
+ *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height)
  *     del input             # <<<<<<<<<<<<<<
  *     for x in range(0, width):
  *         for y in range(0, height):
@@ -2009,7 +2013,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   __pyx_v_input = NULL;
 
   /* "python_to_c.pyx":18
- *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height)
+ *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height)
  *     del input
  *     for x in range(0, width):             # <<<<<<<<<<<<<<
  *         for y in range(0, height):
@@ -2027,35 +2031,35 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   if (likely(PyList_CheckExact(__pyx_t_4)) || PyTuple_CheckExact(__pyx_t_4)) {
-    __pyx_t_6 = __pyx_t_4; __Pyx_INCREF(__pyx_t_6); __pyx_t_19 = 0;
-    __pyx_t_20 = NULL;
+    __pyx_t_6 = __pyx_t_4; __Pyx_INCREF(__pyx_t_6); __pyx_t_20 = 0;
+    __pyx_t_21 = NULL;
   } else {
-    __pyx_t_19 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 18, __pyx_L1_error)
+    __pyx_t_20 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 18, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_20 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 18, __pyx_L1_error)
+    __pyx_t_21 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 18, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   for (;;) {
-    if (likely(!__pyx_t_20)) {
+    if (likely(!__pyx_t_21)) {
       if (likely(PyList_CheckExact(__pyx_t_6))) {
-        if (__pyx_t_19 >= PyList_GET_SIZE(__pyx_t_6)) break;
+        if (__pyx_t_20 >= PyList_GET_SIZE(__pyx_t_6)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_19); __Pyx_INCREF(__pyx_t_4); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 18, __pyx_L1_error)
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_20); __Pyx_INCREF(__pyx_t_4); __pyx_t_20++; if (unlikely(0 < 0)) __PYX_ERR(0, 18, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_6, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 18, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_6, __pyx_t_20); __pyx_t_20++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 18, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       } else {
-        if (__pyx_t_19 >= PyTuple_GET_SIZE(__pyx_t_6)) break;
+        if (__pyx_t_20 >= PyTuple_GET_SIZE(__pyx_t_6)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_19); __Pyx_INCREF(__pyx_t_4); __pyx_t_19++; if (unlikely(0 < 0)) __PYX_ERR(0, 18, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_20); __Pyx_INCREF(__pyx_t_4); __pyx_t_20++; if (unlikely(0 < 0)) __PYX_ERR(0, 18, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_6, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 18, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_6, __pyx_t_20); __pyx_t_20++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 18, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       }
     } else {
-      __pyx_t_4 = __pyx_t_20(__pyx_t_6);
+      __pyx_t_4 = __pyx_t_21(__pyx_t_6);
       if (unlikely(!__pyx_t_4)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
@@ -2088,35 +2092,35 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
-      __pyx_t_4 = __pyx_t_2; __Pyx_INCREF(__pyx_t_4); __pyx_t_21 = 0;
-      __pyx_t_22 = NULL;
+      __pyx_t_4 = __pyx_t_2; __Pyx_INCREF(__pyx_t_4); __pyx_t_22 = 0;
+      __pyx_t_23 = NULL;
     } else {
-      __pyx_t_21 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 19, __pyx_L1_error)
+      __pyx_t_22 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 19, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_22 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 19, __pyx_L1_error)
+      __pyx_t_23 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 19, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     for (;;) {
-      if (likely(!__pyx_t_22)) {
+      if (likely(!__pyx_t_23)) {
         if (likely(PyList_CheckExact(__pyx_t_4))) {
-          if (__pyx_t_21 >= PyList_GET_SIZE(__pyx_t_4)) break;
+          if (__pyx_t_22 >= PyList_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_2 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_21); __Pyx_INCREF(__pyx_t_2); __pyx_t_21++; if (unlikely(0 < 0)) __PYX_ERR(0, 19, __pyx_L1_error)
+          __pyx_t_2 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_22); __Pyx_INCREF(__pyx_t_2); __pyx_t_22++; if (unlikely(0 < 0)) __PYX_ERR(0, 19, __pyx_L1_error)
           #else
-          __pyx_t_2 = PySequence_ITEM(__pyx_t_4, __pyx_t_21); __pyx_t_21++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
+          __pyx_t_2 = PySequence_ITEM(__pyx_t_4, __pyx_t_22); __pyx_t_22++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           #endif
         } else {
-          if (__pyx_t_21 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
+          if (__pyx_t_22 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_21); __Pyx_INCREF(__pyx_t_2); __pyx_t_21++; if (unlikely(0 < 0)) __PYX_ERR(0, 19, __pyx_L1_error)
+          __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_22); __Pyx_INCREF(__pyx_t_2); __pyx_t_22++; if (unlikely(0 < 0)) __PYX_ERR(0, 19, __pyx_L1_error)
           #else
-          __pyx_t_2 = PySequence_ITEM(__pyx_t_4, __pyx_t_21); __pyx_t_21++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
+          __pyx_t_2 = PySequence_ITEM(__pyx_t_4, __pyx_t_22); __pyx_t_22++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           #endif
         }
       } else {
-        __pyx_t_2 = __pyx_t_22(__pyx_t_4);
+        __pyx_t_2 = __pyx_t_23(__pyx_t_4);
         if (unlikely(!__pyx_t_2)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
@@ -2137,8 +2141,8 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
  *                 image_arr[x*height*3 + y*3 + ch] = output_data[x*height*3 + y*3 + ch]
  *     return image_arr
  */
-      for (__pyx_t_23 = 0; __pyx_t_23 < 3; __pyx_t_23+=1) {
-        __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_t_23); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
+      for (__pyx_t_24 = 0; __pyx_t_24 < 3; __pyx_t_24+=1) {
+        __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_t_24); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_XDECREF_SET(__pyx_v_ch, __pyx_t_2);
         __pyx_t_2 = 0;
@@ -2164,9 +2168,9 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
         __pyx_t_2 = PyNumber_Add(__pyx_t_5, __pyx_v_ch); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_24 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_24 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 21, __pyx_L1_error)
+        __pyx_t_25 = __Pyx_PyIndex_AsSsize_t(__pyx_t_2); if (unlikely((__pyx_t_25 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 21, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = PyFloat_FromDouble((__pyx_v_output_data[__pyx_t_24])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
+        __pyx_t_2 = PyFloat_FromDouble((__pyx_v_output_data[__pyx_t_25])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_t_5 = PyNumber_Multiply(__pyx_v_x, __pyx_v_height); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 21, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
@@ -2175,13 +2179,13 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __pyx_t_5 = PyNumber_Multiply(__pyx_v_y, __pyx_int_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 21, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_25 = PyNumber_Add(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 21, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_25);
+        __pyx_t_26 = PyNumber_Add(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 21, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_26);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_5 = PyNumber_Add(__pyx_t_25, __pyx_v_ch); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 21, __pyx_L1_error)
+        __pyx_t_5 = PyNumber_Add(__pyx_t_26, __pyx_v_ch); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 21, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
+        __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
         if (unlikely(PyObject_SetItem(__pyx_v_image_arr, __pyx_t_5, __pyx_t_2) < 0)) __PYX_ERR(0, 21, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -2198,7 +2202,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
     /* "python_to_c.pyx":18
- *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height)
+ *     output_data = generate(<double*> input.data, samples, exposure, aberration_int, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height)
  *     del input
  *     for x in range(0, width):             # <<<<<<<<<<<<<<
  *         for y in range(0, height):
@@ -2220,9 +2224,9 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   goto __pyx_L0;
 
   /* "python_to_c.pyx":7
- *     double* generate(double* x, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int x_min, int x_max, int y_min, int y_max, int width, int height)
+ *     double* generate(double* x, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, int width, int height)
  * 
- * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height):             # <<<<<<<<<<<<<<
+ * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height):             # <<<<<<<<<<<<<<
  *     aberration_int = 0
  *     if aberration == 'coma':
  */
@@ -2234,7 +2238,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_25);
+  __Pyx_XDECREF(__pyx_t_26);
   { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
     __Pyx_PyThreadState_declare
     __Pyx_PyThreadState_assign
@@ -2266,6 +2270,7 @@ static PyObject *__pyx_pw_11python_to_c_1pass_to_c(PyObject *__pyx_self, PyObjec
   PyObject *__pyx_v_strength = 0;
   PyObject *__pyx_v_dark_current = 0;
   PyObject *__pyx_v_readout_noise = 0;
+  PyObject *__pyx_v_shot_noise = 0;
   PyObject *__pyx_v_x_min = 0;
   PyObject *__pyx_v_x_max = 0;
   PyObject *__pyx_v_y_min = 0;
@@ -2279,12 +2284,14 @@ static PyObject *__pyx_pw_11python_to_c_1pass_to_c(PyObject *__pyx_self, PyObjec
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("pass_to_c (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_image_arr,&__pyx_n_s_samples,&__pyx_n_s_exposure,&__pyx_n_s_aberration,&__pyx_n_s_strength,&__pyx_n_s_dark_current,&__pyx_n_s_readout_noise,&__pyx_n_s_x_min,&__pyx_n_s_x_max,&__pyx_n_s_y_min,&__pyx_n_s_y_max,&__pyx_n_s_width,&__pyx_n_s_height,0};
-    PyObject* values[13] = {0,0,0,0,0,0,0,0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_image_arr,&__pyx_n_s_samples,&__pyx_n_s_exposure,&__pyx_n_s_aberration,&__pyx_n_s_strength,&__pyx_n_s_dark_current,&__pyx_n_s_readout_noise,&__pyx_n_s_shot_noise,&__pyx_n_s_x_min,&__pyx_n_s_x_max,&__pyx_n_s_y_min,&__pyx_n_s_y_max,&__pyx_n_s_width,&__pyx_n_s_height,0};
+    PyObject* values[14] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case 14: values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
+        CYTHON_FALLTHROUGH;
         case 13: values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
         CYTHON_FALLTHROUGH;
         case 12: values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
@@ -2323,79 +2330,85 @@ static PyObject *__pyx_pw_11python_to_c_1pass_to_c(PyObject *__pyx_self, PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_samples)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 1); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 1); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_exposure)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 2); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 2); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_aberration)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 3); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 3); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_strength)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 4); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 4); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dark_current)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 5); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 5); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_readout_noise)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 6); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 6); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
-        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x_min)) != 0)) kw_args--;
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_shot_noise)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 7); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 7); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  8:
-        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x_max)) != 0)) kw_args--;
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x_min)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 8); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 8); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  9:
-        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y_min)) != 0)) kw_args--;
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x_max)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 9); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 9); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 10:
-        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y_max)) != 0)) kw_args--;
+        if (likely((values[10] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y_min)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 10); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 10); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 11:
-        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_width)) != 0)) kw_args--;
+        if (likely((values[11] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y_max)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 11); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 11); __PYX_ERR(0, 7, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case 12:
-        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_height)) != 0)) kw_args--;
+        if (likely((values[12] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_width)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, 12); __PYX_ERR(0, 7, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 12); __PYX_ERR(0, 7, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case 13:
+        if (likely((values[13] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_height)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, 13); __PYX_ERR(0, 7, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "pass_to_c") < 0)) __PYX_ERR(0, 7, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 13) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 14) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -2411,6 +2424,7 @@ static PyObject *__pyx_pw_11python_to_c_1pass_to_c(PyObject *__pyx_self, PyObjec
       values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
       values[11] = PyTuple_GET_ITEM(__pyx_args, 11);
       values[12] = PyTuple_GET_ITEM(__pyx_args, 12);
+      values[13] = PyTuple_GET_ITEM(__pyx_args, 13);
     }
     __pyx_v_image_arr = values[0];
     __pyx_v_samples = values[1];
@@ -2419,29 +2433,30 @@ static PyObject *__pyx_pw_11python_to_c_1pass_to_c(PyObject *__pyx_self, PyObjec
     __pyx_v_strength = values[4];
     __pyx_v_dark_current = values[5];
     __pyx_v_readout_noise = values[6];
-    __pyx_v_x_min = values[7];
-    __pyx_v_x_max = values[8];
-    __pyx_v_y_min = values[9];
-    __pyx_v_y_max = values[10];
-    __pyx_v_width = values[11];
-    __pyx_v_height = values[12];
+    __pyx_v_shot_noise = values[7];
+    __pyx_v_x_min = values[8];
+    __pyx_v_x_max = values[9];
+    __pyx_v_y_min = values[10];
+    __pyx_v_y_max = values[11];
+    __pyx_v_width = values[12];
+    __pyx_v_height = values[13];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 13, 13, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 7, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("pass_to_c", 1, 14, 14, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 7, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("python_to_c.pass_to_c", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_11python_to_c_pass_to_c(__pyx_self, __pyx_v_image_arr, __pyx_v_samples, __pyx_v_exposure, __pyx_v_aberration, __pyx_v_strength, __pyx_v_dark_current, __pyx_v_readout_noise, __pyx_v_x_min, __pyx_v_x_max, __pyx_v_y_min, __pyx_v_y_max, __pyx_v_width, __pyx_v_height);
+  __pyx_r = __pyx_pf_11python_to_c_pass_to_c(__pyx_self, __pyx_v_image_arr, __pyx_v_samples, __pyx_v_exposure, __pyx_v_aberration, __pyx_v_strength, __pyx_v_dark_current, __pyx_v_readout_noise, __pyx_v_shot_noise, __pyx_v_x_min, __pyx_v_x_max, __pyx_v_y_min, __pyx_v_y_max, __pyx_v_width, __pyx_v_height);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11python_to_c_pass_to_c(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_image_arr, PyObject *__pyx_v_samples, PyObject *__pyx_v_exposure, PyObject *__pyx_v_aberration, PyObject *__pyx_v_strength, PyObject *__pyx_v_dark_current, PyObject *__pyx_v_readout_noise, PyObject *__pyx_v_x_min, PyObject *__pyx_v_x_max, PyObject *__pyx_v_y_min, PyObject *__pyx_v_y_max, PyObject *__pyx_v_width, PyObject *__pyx_v_height) {
+static PyObject *__pyx_pf_11python_to_c_pass_to_c(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_image_arr, PyObject *__pyx_v_samples, PyObject *__pyx_v_exposure, PyObject *__pyx_v_aberration, PyObject *__pyx_v_strength, PyObject *__pyx_v_dark_current, PyObject *__pyx_v_readout_noise, PyObject *__pyx_v_shot_noise, PyObject *__pyx_v_x_min, PyObject *__pyx_v_x_max, PyObject *__pyx_v_y_min, PyObject *__pyx_v_y_max, PyObject *__pyx_v_width, PyObject *__pyx_v_height) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2450,7 +2465,7 @@ static PyObject *__pyx_pf_11python_to_c_pass_to_c(CYTHON_UNUSED PyObject *__pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("pass_to_c", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_11python_to_c_pass_to_c(__pyx_v_image_arr, __pyx_v_samples, __pyx_v_exposure, __pyx_v_aberration, __pyx_v_strength, __pyx_v_dark_current, __pyx_v_readout_noise, __pyx_v_x_min, __pyx_v_x_max, __pyx_v_y_min, __pyx_v_y_max, __pyx_v_width, __pyx_v_height, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_11python_to_c_pass_to_c(__pyx_v_image_arr, __pyx_v_samples, __pyx_v_exposure, __pyx_v_aberration, __pyx_v_strength, __pyx_v_dark_current, __pyx_v_readout_noise, __pyx_v_shot_noise, __pyx_v_x_min, __pyx_v_x_max, __pyx_v_y_min, __pyx_v_y_max, __pyx_v_width, __pyx_v_height, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4134,6 +4149,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_readout_noise, __pyx_k_readout_noise, sizeof(__pyx_k_readout_noise), 0, 0, 1, 1},
   {&__pyx_n_s_samples, __pyx_k_samples, sizeof(__pyx_k_samples), 0, 0, 1, 1},
+  {&__pyx_n_s_shot_noise, __pyx_k_shot_noise, sizeof(__pyx_k_shot_noise), 0, 0, 1, 1},
   {&__pyx_n_s_strength, __pyx_k_strength, sizeof(__pyx_k_strength), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
@@ -4537,9 +4553,9 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "python_to_c.pyx":7
- *     double* generate(double* x, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int x_min, int x_max, int y_min, int y_max, int width, int height)
+ *     double* generate(double* x, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, int width, int height)
  * 
- * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, x_min, x_max, y_min, y_max, width, height):             # <<<<<<<<<<<<<<
+ * cpdef pass_to_c(image_arr, samples, exposure, aberration, strength, dark_current, readout_noise, shot_noise, x_min, x_max, y_min, y_max, width, height):             # <<<<<<<<<<<<<<
  *     aberration_int = 0
  *     if aberration == 'coma':
  */

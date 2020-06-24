@@ -99,22 +99,41 @@ double* generateImageArray(int width, int height, int channels){
     return img_array;
 }
 
-double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int x_min, int x_max, int y_min, int y_max, int width, int height){
+void printAberration(int aberration, int shotNoise){
     switch (aberration)
     {
     case 0:
-        printf("Applying coma:   0 %%");
+        if (shotNoise == 0){
+            printf("Applying coma:   0 %%");
+        }
+        else{
+            printf("Applying coma with shot noise:   0 %%");
+        }
         break;
     case 1:
-        printf("Applying tangential astigmatism:   0 %%");
+        if (shotNoise == 0){
+            printf("Applying tangential astigmatism:   0 %%");
+        }
+        else{
+            printf("Applying tangential astigmatism with shot noise:   0 %%");
+        }
         break;
     case 2:
-        printf("Applying sagittal astigmatism:   0 %%");
+        if (shotNoise == 0){
+            printf("Applying sagittal astigmatism:   0 %%");
+        }
+        else{
+            printf("Applying sagittal astigmatism with shot noise:   0 %%");
+        }
         break;
     default:
         printf("Render progress:   0 %%");
         break;
     };
+}
+
+double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, int width, int height){
+    printAberration(aberration, shotNoise);
     double gain = exposure/(samples*10);
     strength = strength * width/2000;
     double* output = generateImageArray(width, height, 3);
@@ -126,23 +145,42 @@ double* generate(double* input, int samples, double exposure, int aberration, do
     double center[2] = {floor((width + 1) / 2) + 0.5, floor((height + 1) / 2) + 0.5};
     double d_max = vectorLength(center);
     
-    for(int x = x_min; x < x_max; x++){
-        
-        position[0] = x;
-        printf("\b\b\b\b\b%3d %%", (100*(x-x_min)/(x_max-x_min)+1) );
-        for(int y = y_min; y < y_max; y++){
-            for(int i = 0; i < 3; i++){
-                rgb[i] = arrayValue(input, x, y, i, width);
+    if (shotNoise == 0){
+        for(int x = x_min; x < x_max; x++){
+            position[0] = x;
+            printf("\b\b\b\b\b%3d %%", (100*(x-x_min)/(x_max-x_min)+1) );
+            for(int y = y_min; y < y_max; y++){
+                for(int i = 0; i < 3; i++){
+                    rgb[i] = arrayValue(input, x, y, i, width);
+                }
+                position[1] = y;
+                orientation = aberrationOrientation(position, center);
+                size = aberrationSize(position, center, d_max, strength);
+                for(int i = 0; i < samples; i++){
+                    psf(aberration, psf_pos, position, orientation, size);
+                    applyLightRay(output, psf_pos, rgb, gain, width, height);
+                }
             }
-            position[1] = y;
-            orientation = aberrationOrientation(position, center);
-            size = aberrationSize(position, center, d_max, strength);
-            for(int i = 0; i < samples; i++){
+        }
+    }
+    else{
+        int maxSamples = samples*width*height;
+        for(int p = 0; p < 100; p++){
+            printf("\b\b\b\b\b%3d %%", (100*p/100+1) );
+            for(int s = 0; s < maxSamples/100; s++){
+                position[0] = floor(randomNumber()*(width-1));
+                position[1] = floor(randomNumber()*(height-1));
+                for(int i = 0; i < 3; i++){
+                    rgb[i] = arrayValue(input, (int)position[0], (int)position[1], i, width);
+                }
+                orientation = aberrationOrientation(position, center);
+                size = aberrationSize(position, center, d_max, strength);
                 psf(aberration, psf_pos, position, orientation, size);
                 applyLightRay(output, psf_pos, rgb, gain, width, height);
             }
         }
     }
+    
     printf("\n");
     float offset = 0.5;
     float multiplier = 2;
@@ -163,15 +201,17 @@ double* generate(double* input, int samples, double exposure, int aberration, do
     double amount = 0;
     if (darkCurrent > 0){
         for (int i = 0; i < width*height*3; i++){
-            amount = pow(randomNumber(), 2) * darkCurrent / 300;
-            output[i] += amount;
+            amount = randomNormalDistribution(-1*darkCurrent / 1000, darkCurrent / 1000);
+            if (amount > 0){
+                output[i] += amount;
+            }
         }
         printf("Dark current noise added.\n");
     }
 
     if (readoutNoise > 0){
         for (int i = 0; i < width*height*3; i++){
-            amount = randomNormalDistribution(-0.5, 0.5) * readoutNoise / 300;
+            amount = randomNormalDistribution(-1*readoutNoise / 1000, readoutNoise / 1000);
             output[i] += amount;
             if (output[i] < 0){
                 output[i] = 0;
