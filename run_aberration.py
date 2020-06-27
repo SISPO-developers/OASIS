@@ -145,7 +145,6 @@ class OpticalAberration:
 
     @classmethod
     def generate_chromatic_aberration(cls, input, amount, width, height):
-        sys.stdout.write("Applying chromatic aberration:   0 %")
         img_r = np.zeros((width, height))
         img_g = np.zeros((width, height))
         img_b = np.zeros((width, height))

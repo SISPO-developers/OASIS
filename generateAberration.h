@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdint.h>
+#include <inttypes.h>
+#include <xoshiro256plus.h>
 
 inline double dotProduct(double* u, double* v){
     return u[0]*v[0] + u[1]*v[1];
@@ -10,13 +13,14 @@ inline double vectorLength(double* u){
 }
 
 inline double randomNumber(){
-    return (rand()/(double)RAND_MAX);
+    //return (rand()/(double)RAND_MAX);
+    return next();
 }
 
-inline double randomNormalDistribution(double min, double max){
+inline double randomGaussianDistribution(double mean, double std_dev){
     double rand1 = randomNumber();
     double rand2 = randomNumber();
-    return sqrt(-2 * log(rand1)) * cos(2 * M_PI * rand2) * (max - min) + min;
+    return sqrt(-2 * log(rand1)) * cos(2 * M_PI * rand2) * std_dev + mean;
 }
 
 inline void psf(int aberration, double* vec_out, double* position, double orientation, double size){
@@ -34,12 +38,12 @@ inline void psf(int aberration, double* vec_out, double* position, double orient
         break;
     case 1:
         orientation += M_PI_2;
-        d = size * randomNormalDistribution(-1, 1);
+        d = size * randomGaussianDistribution(0, 1);
         vec_out[0] = d*sin(orientation) + position[0];
         vec_out[1] = d*cos(orientation) + position[1];
         break;
     case 2:
-        d = size * randomNormalDistribution(-1, 1);
+        d = size * randomGaussianDistribution(0, 1);
         vec_out[0] = d*sin(orientation) + position[0];
         vec_out[1] = d*cos(orientation) + position[1];
         break;
@@ -133,6 +137,8 @@ void printAberration(int aberration, int shotNoise){
 }
 
 double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, int width, int height){
+    create(rand(), rand(), rand(), rand());
+
     printAberration(aberration, shotNoise);
     double gain = exposure/(samples*10);
     strength = strength * width/2000;
@@ -201,7 +207,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
     double amount = 0;
     if (darkCurrent > 0){
         for (int i = 0; i < width*height*3; i++){
-            amount = randomNormalDistribution(-1*darkCurrent / 1000, darkCurrent / 1000);
+            amount = randomGaussianDistribution(0, darkCurrent / 1000);
             if (amount > 0){
                 output[i] += amount;
             }
@@ -211,7 +217,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
 
     if (readoutNoise > 0){
         for (int i = 0; i < width*height*3; i++){
-            amount = randomNormalDistribution(-1*readoutNoise / 1000, readoutNoise / 1000);
+            amount = randomGaussianDistribution(0, readoutNoise / 1000);
             output[i] += amount;
             if (output[i] < 0){
                 output[i] = 0;

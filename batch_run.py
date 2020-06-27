@@ -7,10 +7,10 @@ from os.path import isfile, join
 input_folder = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/inputs/test'
 output_folder = 'C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/test'
 output_type = 'jpg'
-samples = 1
+samples = 10
 exposure = 3.5
 aberration = 'coma'
-aberration_size = 0
+aberration_size = 12
 chromatic_aberration = 0
 dark_current_noise = 0
 readout_noise = 0
