@@ -33,7 +33,7 @@ class OpticalAberration:
         return h_str + ":" + m_str + ":" + s_str		
 
     @classmethod
-    def generate_aberration(cls, in_string, out_string, samples, exposure, aberration, size, ca_size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max):
+    def generate_aberration(cls, in_string, out_string, samples, exposure, aberration, size, ca_size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max, dist, fx, fy, cx, cy, k1, k2, p1, p2, k3):
         start = int(round(time.time() * 1000))
         dimensions = [0, 0]
         render_dimensions = [x_min, x_max, y_min, y_max]
@@ -46,6 +46,10 @@ class OpticalAberration:
         y_max = render_dimensions[3]
         if ca_size > 0:
             cls.generate_chromatic_aberration(input, ca_size, width, height)
+        if dist > 0:
+            cam_mat = cls.get_camera_matrix(fx, fy, cx, cy)
+            dist_coeff = cls.get_dist_coeff(k1, k2, p1, p2, k3)
+            input = distort_image.distort_matrix(width, height, input, cam_mat, dist_coeff)
         output_img = python_to_c.pass_to_c(input, samples, exposure, aberration, size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max, width, height)
         cls.write_image(output_img, out_string, width, height)
         end = int(round(time.time() * 1000)) - start

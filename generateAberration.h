@@ -140,8 +140,9 @@ double* generate(double* input, int samples, double exposure, int aberration, do
     create(rand(), rand(), rand(), rand());
 
     printAberration(aberration, shotNoise);
-    double gain = exposure/(samples*10);
-    strength = strength * width/2000;
+    //double gain = exposure/(samples*10);
+    double gain = exposure * (double) 1/(samples*3);
+    strength = sqrt(strength) * width/2000;
     double* output = generateImageArray(width, height, 3);
     double position[2] = {0 ,0};
     double orientation = 0;
@@ -188,7 +189,8 @@ double* generate(double* input, int samples, double exposure, int aberration, do
     }
     
     printf("\n");
-    float offset = 0.5;
+    
+    /* float offset = 0.5;
     float multiplier = 2;
     for(int i = 0; i < 3; i++){
         int x = center[0]-offset; int y = center[1]-offset;
@@ -202,7 +204,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
 
         x = center[0]+offset; y = center[1]+offset;
         output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i, width) * gain * samples * multiplier;
-    }
+    } */
 
     double amount = 0;
     if (darkCurrent > 0){
