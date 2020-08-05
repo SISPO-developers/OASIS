@@ -17,12 +17,12 @@ exposure = 1
 
 # optical aberrations
 aberration = coma ###astigmatism_tangential
-aberration_size = 4
+aberration_size = 20
 chromatic_aberration = 0
 
 # image noise
-dark_current_noise = 4
-readout_noise = 5
+dark_current_noise = 2
+readout_noise = 7
 shot_noise = 0
 
 # distortion

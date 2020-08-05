@@ -67,7 +67,7 @@ class OpticalAberration:
             print("Distortion applied.")
         output_img = []
         if size > 0 or shot_noise > 0 or dark_noise > 0 or read_noise > 0:
-            output_img = python_to_c.pass_to_c(input, samples, exposure, aberration, size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max, lens, lens_scale, lens_offset, lens_dim[0], lens_dim[1], width, height)
+            output_img = python_to_c.pass_to_c(input, samples, exposure, aberration, size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max, lens, lens_scale, lens_offset, lens_dim[0], lens_dim[1], width, height, monochrome)
         else:
             output_img = input
         cls.write_image(output_img, out_string, width, height, monochrome)

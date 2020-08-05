@@ -156,7 +156,7 @@ void printAberration(int aberration, int shotNoise){
     };
 }
 
-double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, double* lens, double lens_scale, double lens_offset, int lens_width, int lens_height, int width, int height){
+double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, double* lens, double lens_scale, double lens_offset, int lens_width, int lens_height, int width, int height, int mono){
     create(rand(), rand(), rand(), rand());
     double* output = generateImageArray(width, height, 3);
     if(strength > 0){
@@ -229,32 +229,71 @@ double* generate(double* input, int samples, double exposure, int aberration, do
         }
     }
 
-    double amount = 0;
-    if (darkCurrent > 0){
-        for (int i = 0; i < width*height*3; i++){
-            amount = fabs(randomGaussianDistribution(0, darkCurrent / 1000));
-            output[i] += amount;
-            if (output[i] > 1){
-                output[i] = 1;
+    if(mono == 0){
+        double amount = 0;
+        if (darkCurrent > 0){
+            for (int i = 0; i < width*height*3; i++){
+                amount = fabs(randomGaussianDistribution(0, darkCurrent / 1000));
+                output[i] += amount;
+                if (output[i] > 1){
+                    output[i] = 1;
+                }
             }
+            printf("Dark current noise added.\n");
         }
-        printf("Dark current noise added.\n");
+
+        if (readoutNoise > 0){
+            for (int i = 0; i < width*height*3; i++){
+                amount = randomGaussianDistribution(0, readoutNoise / 1000);
+                output[i] += amount;
+                if (output[i] < 0){
+                    output[i] = 0;
+                }
+                else if (output[i] > 1){
+                    output[i] = 1;
+                }
+                
+            }
+            printf("Readout noise added.\n");
+        }
+    }
+    else{
+        double amount = 0;
+        if (darkCurrent > 0){
+            for(int x = x_min; x < x_max; x++){
+                for(int y = y_min; y < y_max; y++){
+                    amount = fabs(randomGaussianDistribution(0, darkCurrent / 1000));
+                    for(int i = 0; i < 3; i++){
+                        output[x*height*3 + y*3 + i] += amount;
+                        if (output[i] > 1){
+                            output[i] = 1;
+                        }
+                    }
+                }
+            }
+            printf("Dark current noise added.\n");
+        }
+
+        if (readoutNoise > 0){
+            for(int x = x_min; x < x_max; x++){
+                for(int y = y_min; y < y_max; y++){
+                    amount = randomGaussianDistribution(0, readoutNoise / 1000);
+                    for(int i = 0; i < 3; i++){
+                        output[x*height*3 + y*3 + i] += amount;
+                        if (output[i] < 0){
+                            output[i] = 0;
+                        }
+                        else if (output[i] > 1){
+                            output[i] = 1;
+                        }
+                    }
+                }
+            }
+            printf("Readout noise added.\n");
+        }
     }
 
-    if (readoutNoise > 0){
-        for (int i = 0; i < width*height*3; i++){
-            amount = randomGaussianDistribution(0, readoutNoise / 1000);
-            output[i] += amount;
-            if (output[i] < 0){
-                output[i] = 0;
-            }
-            else if (output[i] > 1){
-                output[i] = 1;
-            }
-            
-        }
-        printf("Readout noise added.\n");
-    }
+    
 
     return output;
 }
