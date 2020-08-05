@@ -33,8 +33,9 @@ class OpticalAberration:
         return h_str + ":" + m_str + ":" + s_str		
 
     @classmethod
-    def generate_aberration(cls, in_string, out_string, samples, exposure, aberration, size, ca_size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max, dist, fx, fy, cx, cy, k1, k2, p1, p2, k3):
+    def generate_aberration(cls, in_string, out_string, lens_string, monochrome, samples, exposure, aberration, size, ca_size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max, dist, fx, fy, cx, cy, k1, k2, p1, p2, k3):
         start = int(round(time.time() * 1000))
+        print("Importing image.")
         dimensions = [0, 0]
         render_dimensions = [x_min, x_max, y_min, y_max]
         input = cls.read_image(in_string, dimensions, render_dimensions)
@@ -44,14 +45,32 @@ class OpticalAberration:
         x_max = render_dimensions[1]
         y_min = render_dimensions[2]
         y_max = render_dimensions[3]
+        lens = []
+        lens_scale = 0
+        lens_offset = 0
+        lens_dim = [0, 0]
+        if lens_string != '0':
+            print("Importing lens file.")
+            lens = cls.read_image(lens_string, lens_dim, [0,0,0,0])
+            if width > height:
+                lens_scale = lens_dim[0]/width
+                lens_offset = (lens_dim[1]-lens_scale*height)/2
+            else:
+                lens_scale = lens_dim[1]/height
+                lens_offset = (lens_dim[0]-lens_scale*width)/2
         if ca_size > 0:
             cls.generate_chromatic_aberration(input, ca_size, width, height)
         if dist > 0:
             cam_mat = cls.get_camera_matrix(fx, fy, cx, cy)
             dist_coeff = cls.get_dist_coeff(k1, k2, p1, p2, k3)
             input = distort_image.distort_matrix(width, height, input, cam_mat, dist_coeff)
-        output_img = python_to_c.pass_to_c(input, samples, exposure, aberration, size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max, width, height)
-        cls.write_image(output_img, out_string, width, height)
+            print("Distortion applied.")
+        output_img = []
+        if size > 0 or shot_noise > 0 or dark_noise > 0 or read_noise > 0:
+            output_img = python_to_c.pass_to_c(input, samples, exposure, aberration, size, dark_noise, read_noise, shot_noise, x_min, x_max, y_min, y_max, lens, lens_scale, lens_offset, lens_dim[0], lens_dim[1], width, height)
+        else:
+            output_img = input
+        cls.write_image(output_img, out_string, width, height, monochrome)
         end = int(round(time.time() * 1000)) - start
         total_str = cls.time_to_string(end)
         print("Total time: " + total_str)
@@ -83,7 +102,7 @@ class OpticalAberration:
         input = []
         exr_in = 0
         img_type = file.split('.')[1]
-        if img_type == 'jpg' or img_type == 'jpeg' or img_type == 'png':
+        if img_type == 'jpg' or img_type == 'jpeg' or img_type == 'png' or img_type == 'JPG' or img_type == 'JPEG' or img_type == 'PNG':
             exr_in = 0
             img = Image.open(file)
             input = list(img.getdata())
@@ -192,31 +211,52 @@ class OpticalAberration:
         distort_image.distort(input_file, output_file, cam_mat, dist_coeff)
 
     @ classmethod
-    def write_image(cls, img_array, file, width, height):
+    def write_image(cls, img_array, file, width, height, monochrome):
         sys.stdout.write("Writing file:   0 %")
         img_type = file.split('.')[1]
-        if img_type == "jpg":
+        if img_type == 'jpg' or img_type == 'png' or img_type == 'JPG' or img_type == 'JPEG' or img_type == 'PNG':
             img = Image.new('RGB', (width, height), (0, 0, 0))
-            for i in range(0, width):
-                sys.stdout.write("\r")
-                sys.stdout.write("Writing file:\t" + str(round(i/width*100)) + " %")
-                for j in range(0, height):
-                    ch_r = round(cls.linear_to_sRGB(img_array[i*height*3 + j*3 + 0]))
-                    ch_g = round(cls.linear_to_sRGB(img_array[i*height*3 + j*3 + 1]))
-                    ch_b = round(cls.linear_to_sRGB(img_array[i*height*3 + j*3 + 2]))
-                    img.putpixel((i, j), (int(ch_r), int(ch_g), int(ch_b)))
+            if monochrome == 1:
+                for i in range(0, width):
+                    sys.stdout.write("\r")
+                    sys.stdout.write("Writing file:\t" + str(round(i/width*100)) + " %")
+                    for j in range(0, height):
+                        ch_r = round(cls.linear_to_sRGB(img_array[j*width*3 + i*3 + 0]))
+                        ch_g = round(cls.linear_to_sRGB(img_array[j*width*3 + i*3 + 1]))
+                        ch_b = round(cls.linear_to_sRGB(img_array[j*width*3 + i*3 + 2]))
+                        avg = int((ch_r + ch_g + ch_b)/3)
+                        img.putpixel((i, j), (avg, avg, avg))
+            else:
+                for i in range(0, width):
+                    sys.stdout.write("\r")
+                    sys.stdout.write("Writing file:\t" + str(round(i/width*100)) + " %")
+                    for j in range(0, height):
+                        ch_r = round(cls.linear_to_sRGB(img_array[j*width*3 + i*3 + 0]))
+                        ch_g = round(cls.linear_to_sRGB(img_array[j*width*3 + i*3 + 1]))
+                        ch_b = round(cls.linear_to_sRGB(img_array[j*width*3 + i*3 + 2]))
+                        img.putpixel((i, j), (int(ch_r), int(ch_g), int(ch_b)))
             img.save(file)
         elif img_type == "exr":
             r_out = []
             g_out = []
             b_out = []
-            for i in range(0, height):
-                sys.stdout.write("\r")
-                sys.stdout.write("Writing file:\t" + str(round(i/height*100)) + " %")
-                for j in range(0, width):
-                    r_out.append(img_array[j*height*3 + i*3 + 0])
-                    g_out.append(img_array[j*height*3 + i*3 + 1])
-                    b_out.append(img_array[j*height*3 + i*3 + 2])
+            if monochrome == 1:
+                for i in range(0, height):
+                    sys.stdout.write("\r")
+                    sys.stdout.write("Writing file:\t" + str(round(i/height*100)) + " %")
+                    for j in range(0, width):
+                        avg = (img_array[i*width*3 + j*3 + 0] + img_array[i*width*3 + j*3 + 1] + img_array[i*width*3 + j*3 + 2])/3
+                        r_out.append(avg)
+                        g_out.append(avg)
+                        b_out.append(avg)
+            else:
+                for i in range(0, height):
+                    sys.stdout.write("\r")
+                    sys.stdout.write("Writing file:\t" + str(round(i/height*100)) + " %")
+                    for j in range(0, width):
+                        r_out.append(img_array[i*width*3 + j*3 + 0])
+                        g_out.append(img_array[i*width*3 + j*3 + 1])
+                        b_out.append(img_array[i*width*3 + j*3 + 2])
             data_r = array.array('f', r_out).tobytes()
             data_g = array.array('f', g_out).tobytes()
             data_b = array.array('f', b_out).tobytes()

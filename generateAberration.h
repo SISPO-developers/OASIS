@@ -58,6 +58,30 @@ inline double aberrationSize(double* position, double* center, double d_max, dou
     return d/d_max * strength;
 }
 
+inline double arrayValue(double* array , int x, int y, int ch, int width){
+    return array[x*3 + y*width*3 + ch];
+}
+
+inline double aberrationSizeFromLens(double* position, double* lens, double lens_scale, double lens_offset, double strength, int width, int height, int lens_width, int lens_height){
+    double x = 0;
+    double y = 0;
+    if (width > height){
+        x = position[0] * lens_scale;
+        y = position[1] * lens_scale + lens_offset;
+    }
+    else{
+        x = position[0] * lens_scale + lens_offset;
+        y = position[1] * lens_scale;
+    }
+    double amount = 0;
+    for (int i = 0; i < 3; i++){
+        amount += arrayValue(lens, (int)x, (int)y, i, lens_width);
+    }
+    amount = amount / 3;
+
+    return amount * strength;
+}
+
 inline double aberrationOrientation(double* position, double* center){
     double vec[2] = {position[0] - center[0], position[1] - center[1]};
     double reference[2] = {0, 1};
@@ -66,10 +90,6 @@ inline double aberrationOrientation(double* position, double* center){
         orientation *= -1;
     }
     return orientation;
-}
-
-inline double arrayValue(double* array , int x, int y, int ch, int width){
-    return array[x*3 + y*width*3 + ch];
 }
 
 void printRGB(double* array, int x, int y, int width){
@@ -136,13 +156,12 @@ void printAberration(int aberration, int shotNoise){
     };
 }
 
-double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, int width, int height){
+double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, double* lens, double lens_scale, double lens_offset, int lens_width, int lens_height, int width, int height){
     create(rand(), rand(), rand(), rand());
 
     printAberration(aberration, shotNoise);
-    //double gain = exposure/(samples*10);
     double gain = exposure * (double) 1/(samples*3);
-    strength = sqrt(strength) * width/2000;
+    strength = sqrt(strength) * width/2048;
     double* output = generateImageArray(width, height, 3);
     double position[2] = {0 ,0};
     double orientation = 0;
@@ -162,7 +181,12 @@ double* generate(double* input, int samples, double exposure, int aberration, do
                 }
                 position[1] = y;
                 orientation = aberrationOrientation(position, center);
-                size = aberrationSize(position, center, d_max, strength);
+                if (lens_scale > 0){
+                    size = aberrationSizeFromLens(position, lens, lens_scale, lens_offset, strength, width, height, lens_width, lens_height);
+                }
+                else{
+                    size = aberrationSize(position, center, d_max, strength);
+                }
                 for(int i = 0; i < samples; i++){
                     psf(aberration, psf_pos, position, orientation, size);
                     applyLightRay(output, psf_pos, rgb, gain, width, height);
@@ -171,17 +195,22 @@ double* generate(double* input, int samples, double exposure, int aberration, do
         }
     }
     else{
-        int maxSamples = samples*width*height;
+        int maxSamples = samples*(x_max-x_min)*(y_max-y_min);
         for(int p = 0; p < 100; p++){
             printf("\b\b\b\b\b%3d %%", (100*p/100+1) );
             for(int s = 0; s < maxSamples/100; s++){
-                position[0] = floor(randomNumber()*(width-1));
-                position[1] = floor(randomNumber()*(height-1));
+                position[0] = x_min + floor(randomNumber()*(x_max-x_min-1));
+                position[1] = y_min +  floor(randomNumber()*(y_max-y_min-1));
                 for(int i = 0; i < 3; i++){
                     rgb[i] = arrayValue(input, (int)position[0], (int)position[1], i, width);
                 }
                 orientation = aberrationOrientation(position, center);
-                size = aberrationSize(position, center, d_max, strength);
+                if (lens_scale > 0){
+                    size = aberrationSizeFromLens(position, lens, lens_scale, lens_offset, strength, width, height, lens_width, lens_height);
+                }
+                else{
+                    size = aberrationSize(position, center, d_max, strength);
+                }
                 psf(aberration, psf_pos, position, orientation, size);
                 applyLightRay(output, psf_pos, rgb, gain, width, height);
             }
@@ -209,9 +238,10 @@ double* generate(double* input, int samples, double exposure, int aberration, do
     double amount = 0;
     if (darkCurrent > 0){
         for (int i = 0; i < width*height*3; i++){
-            amount = randomGaussianDistribution(0, darkCurrent / 1000);
-            if (amount > 0){
-                output[i] += amount;
+            amount = fabs(randomGaussianDistribution(0, darkCurrent / 1000));
+            output[i] += amount;
+            if (output[i] > 1){
+                output[i] = 1;
             }
         }
         printf("Dark current noise added.\n");
@@ -224,6 +254,10 @@ double* generate(double* input, int samples, double exposure, int aberration, do
             if (output[i] < 0){
                 output[i] = 0;
             }
+            else if (output[i] > 1){
+                output[i] = 1;
+            }
+            
         }
         printf("Readout noise added.\n");
     }
