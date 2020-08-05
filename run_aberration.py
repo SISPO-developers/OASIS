@@ -49,7 +49,7 @@ class OpticalAberration:
         lens_scale = 0
         lens_offset = 0
         lens_dim = [0, 0]
-        if lens_string != '0':
+        if lens_string != '0' and (size > 0 or shot_noise > 0 or dark_noise > 0 or read_noise > 0):
             print("Importing lens file.")
             lens = cls.read_image(lens_string, lens_dim, [0,0,0,0])
             if width > height:
@@ -122,7 +122,7 @@ class OpticalAberration:
             input = [[0, 0, 0] for i in range(width * height)]
             for j in range(0, width):
                 for i in range(0, height):
-                    input[j*width + i] = cc[j][i]
+                    input[j*height + i] = cc[j][i]
             del cc
             del cc_r
             del cc_g

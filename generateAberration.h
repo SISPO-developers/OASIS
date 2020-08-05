@@ -158,82 +158,76 @@ void printAberration(int aberration, int shotNoise){
 
 double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, double* lens, double lens_scale, double lens_offset, int lens_width, int lens_height, int width, int height){
     create(rand(), rand(), rand(), rand());
-
-    printAberration(aberration, shotNoise);
-    double gain = exposure * (double) 1/(samples*3);
-    strength = sqrt(strength) * width/2048;
     double* output = generateImageArray(width, height, 3);
-    double position[2] = {0 ,0};
-    double orientation = 0;
-    double size = 0;
-    double psf_pos[2] = {0,0};
-    double rgb[3] = {0, 0, 0};
-    double center[2] = {floor((width + 1) / 2) + 0.5, floor((height + 1) / 2) + 0.5};
-    double d_max = vectorLength(center);
-    
-    if (shotNoise == 0){
-        for(int x = x_min; x < x_max; x++){
-            position[0] = x;
-            printf("\b\b\b\b\b%3d %%", (100*(x-x_min)/(x_max-x_min)+1) );
-            for(int y = y_min; y < y_max; y++){
-                for(int i = 0; i < 3; i++){
-                    rgb[i] = arrayValue(input, x, y, i, width);
+    if(strength > 0){
+        printAberration(aberration, shotNoise);
+        double gain = exposure * (double) 1/(samples*3);
+        strength = sqrt(strength) * width/2048;
+        double position[2] = {0 ,0};
+        double orientation = 0;
+        double size = 0;
+        double psf_pos[2] = {0,0};
+        double rgb[3] = {0, 0, 0};
+        double center[2] = {floor((width + 1) / 2) + 0.5, floor((height + 1) / 2) + 0.5};
+        double d_max = vectorLength(center);
+        
+        if (shotNoise == 0){
+            for(int x = x_min; x < x_max; x++){
+                position[0] = x;
+                printf("\b\b\b\b\b%3d %%", (100*(x-x_min)/(x_max-x_min)+1) );
+                for(int y = y_min; y < y_max; y++){
+                    for(int i = 0; i < 3; i++){
+                        rgb[i] = arrayValue(input, x, y, i, width);
+                    }
+                    position[1] = y;
+                    orientation = aberrationOrientation(position, center);
+                    if (lens_scale > 0){
+                        size = aberrationSizeFromLens(position, lens, lens_scale, lens_offset, strength, width, height, lens_width, lens_height);
+                    }
+                    else{
+                        size = aberrationSize(position, center, d_max, strength);
+                    }
+                    for(int i = 0; i < samples; i++){
+                        psf(aberration, psf_pos, position, orientation, size);
+                        applyLightRay(output, psf_pos, rgb, gain, width, height);
+                    }
                 }
-                position[1] = y;
-                orientation = aberrationOrientation(position, center);
-                if (lens_scale > 0){
-                    size = aberrationSizeFromLens(position, lens, lens_scale, lens_offset, strength, width, height, lens_width, lens_height);
-                }
-                else{
-                    size = aberrationSize(position, center, d_max, strength);
-                }
-                for(int i = 0; i < samples; i++){
+            }
+        }
+        else{
+            int maxSamples = samples*(x_max-x_min)*(y_max-y_min);
+            for(int p = 0; p < 100; p++){
+                printf("\b\b\b\b\b%3d %%", (100*p/100+1) );
+                for(int s = 0; s < maxSamples/100; s++){
+                    position[0] = x_min + floor(randomNumber()*(x_max-x_min-1));
+                    position[1] = y_min +  floor(randomNumber()*(y_max-y_min-1));
+                    for(int i = 0; i < 3; i++){
+                        rgb[i] = arrayValue(input, (int)position[0], (int)position[1], i, width);
+                    }
+                    orientation = aberrationOrientation(position, center);
+                    if (lens_scale > 0){
+                        size = aberrationSizeFromLens(position, lens, lens_scale, lens_offset, strength, width, height, lens_width, lens_height);
+                    }
+                    else{
+                        size = aberrationSize(position, center, d_max, strength);
+                    }
                     psf(aberration, psf_pos, position, orientation, size);
                     applyLightRay(output, psf_pos, rgb, gain, width, height);
                 }
             }
         }
+        
+        printf("\n");
     }
     else{
-        int maxSamples = samples*(x_max-x_min)*(y_max-y_min);
-        for(int p = 0; p < 100; p++){
-            printf("\b\b\b\b\b%3d %%", (100*p/100+1) );
-            for(int s = 0; s < maxSamples/100; s++){
-                position[0] = x_min + floor(randomNumber()*(x_max-x_min-1));
-                position[1] = y_min +  floor(randomNumber()*(y_max-y_min-1));
+        for(int x = x_min; x < x_max; x++){
+            for(int y = y_min; y < y_max; y++){
                 for(int i = 0; i < 3; i++){
-                    rgb[i] = arrayValue(input, (int)position[0], (int)position[1], i, width);
+                    output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i, width);
                 }
-                orientation = aberrationOrientation(position, center);
-                if (lens_scale > 0){
-                    size = aberrationSizeFromLens(position, lens, lens_scale, lens_offset, strength, width, height, lens_width, lens_height);
-                }
-                else{
-                    size = aberrationSize(position, center, d_max, strength);
-                }
-                psf(aberration, psf_pos, position, orientation, size);
-                applyLightRay(output, psf_pos, rgb, gain, width, height);
             }
         }
     }
-    
-    printf("\n");
-    
-    /* float offset = 0.5;
-    float multiplier = 2;
-    for(int i = 0; i < 3; i++){
-        int x = center[0]-offset; int y = center[1]-offset;
-        output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i, width) * gain * samples * multiplier;
-
-        x = center[0]-offset; y = center[1]+offset;
-        output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i, width) * gain * samples * multiplier;
-
-        x = center[0]+offset; y = center[1]-offset;
-        output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i, width) * gain * samples * multiplier;
-
-        x = center[0]+offset; y = center[1]+offset;
-        output[x*height*3 + y*3 + i] = arrayValue(input, x, y, i, width) * gain * samples * multiplier;
-    } */
 
     double amount = 0;
     if (darkCurrent > 0){

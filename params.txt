@@ -1,9 +1,9 @@
 # general
 input_folder = C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/inputs/test
 output_folder = C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/outputs/test
-lens_file = C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/aperture2.jpg
-output_type = jpg
-monochromatic_sensor = 0
+lens_file = 0 ###C:/Users/maxim/eclipse-workspace/Optical_Aberrations/res/aperture2.jpg
+output_type = exr
+monochromatic_sensor = 1
 
 # render dimensions
 x_min = 0
@@ -12,17 +12,17 @@ y_min = 0
 y_max = 0
 
 # sample size
-samples = 1
+samples = 100
 exposure = 1
 
 # optical aberrations
-aberration = astigmatism_tangential
-aberration_size = 0
+aberration = coma ###astigmatism_tangential
+aberration_size = 4
 chromatic_aberration = 0
 
 # image noise
-dark_current_noise = 0
-readout_noise = 0
+dark_current_noise = 4
+readout_noise = 5
 shot_noise = 0
 
 # distortion
