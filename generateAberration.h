@@ -3,6 +3,51 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <xoshiro256plus.h>
+#include <sys/timeb.h>
+
+void printTime(int64_t millis){
+    int hours = floor(millis/(1000*60*60));
+    int minutes = floor(millis/(1000*60)) - hours*60;
+    int seconds = floor(millis/1000) - minutes*60 - hours*60*60;
+    int case_definition = 0;
+    if(hours < 10){
+        case_definition += 1;
+    }
+    if(minutes < 10){
+        case_definition += 2;
+    }
+    if(seconds < 10){
+        case_definition += 4;
+    }
+    switch (case_definition){
+    case 0:
+        printf("Render time: %d:%d:%d\n", hours, minutes, seconds);
+        break;
+    case 1:
+        printf("Render time: 0%d:%d:%d\n", hours, minutes, seconds);
+        break;
+    case 2:
+        printf("Render time: %d:0%d:%d\n", hours, minutes, seconds);
+        break;
+    case 3:
+        printf("Render time: 0%d:0%d:%d\n", hours, minutes, seconds);
+        break;
+    case 4:
+        printf("Render time: %d:%d:0%d\n", hours, minutes, seconds);
+        break;
+    case 5:
+        printf("Render time: 0%d:%d:0%d\n", hours, minutes, seconds);
+        break;
+    case 6:
+        printf("Render time: %d:0%d:0%d\n", hours, minutes, seconds);
+        break;
+    case 7:
+        printf("Render time: 0%d:0%d:0%d\n", hours, minutes, seconds);
+        break;
+    default:
+        break;
+    }
+}
 
 inline double dotProduct(double* u, double* v){
     return u[0]*v[0] + u[1]*v[1];
@@ -123,46 +168,58 @@ double* generateImageArray(int width, int height, int channels){
     return img_array;
 }
 
-void printAberration(int aberration, int shotNoise){
-    switch (aberration)
-    {
-    case 0:
-        if (shotNoise == 0){
-            printf("Applying coma:   0 %%");
-        }
-        else{
-            printf("Applying coma with shot noise:   0 %%");
-        }
-        break;
-    case 1:
-        if (shotNoise == 0){
-            printf("Applying tangential astigmatism:   0 %%");
-        }
-        else{
-            printf("Applying tangential astigmatism with shot noise:   0 %%");
-        }
-        break;
-    case 2:
-        if (shotNoise == 0){
-            printf("Applying sagittal astigmatism:   0 %%");
-        }
-        else{
-            printf("Applying sagittal astigmatism with shot noise:   0 %%");
-        }
-        break;
-    default:
-        printf("Render progress:   0 %%");
-        break;
-    };
+void printAberration(int aberration, int shotNoise, double strength){
+    if(strength == 0){
+        printf("Applying shot noise:   0 %%");
+    }
+    else{
+        switch (aberration)
+        {
+        case 0:
+            if (shotNoise == 0){
+                printf("Applying coma:   0 %%");
+            }
+            else{
+                printf("Applying coma with shot noise:   0 %%");
+            }
+            break;
+        case 1:
+            if (shotNoise == 0){
+                printf("Applying tangential astigmatism:   0 %%");
+            }
+            else{
+                printf("Applying tangential astigmatism with shot noise:   0 %%");
+            }
+            break;
+        case 2:
+            if (shotNoise == 0){
+                printf("Applying sagittal astigmatism:   0 %%");
+            }
+            else{
+                printf("Applying sagittal astigmatism with shot noise:   0 %%");
+            }
+            break;
+        default:
+            printf("Render progress:   0 %%");
+            break;
+        };
+    }
 }
 
 double* generate(double* input, int samples, double exposure, int aberration, double strength, double darkCurrent, double readoutNoise, int shotNoise, int x_min, int x_max, int y_min, int y_max, double* lens, double lens_scale, double lens_offset, int lens_width, int lens_height, int width, int height, int mono){
     create(rand(), rand(), rand(), rand());
     double* output = generateImageArray(width, height, 3);
-    if(strength > 0){
-        printAberration(aberration, shotNoise);
+    if(strength != 0 || shotNoise == 1){
+        struct timeb t_start, t_end;
+        uint64_t t_elapsed;
+        ftime(&t_start);
+        printAberration(aberration, shotNoise, strength);
         double gain = exposure * (double) 1/(samples*3);
-        strength = sqrt(strength) * width/2048;
+        int internal_coma = 0;
+        if(strength < 0){
+            internal_coma = 1;
+        }
+        strength = sqrt(fabs(strength)) * width/2048;
         double position[2] = {0 ,0};
         double orientation = 0;
         double size = 0;
@@ -180,7 +237,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
                         rgb[i] = arrayValue(input, x, y, i, width);
                     }
                     position[1] = y;
-                    orientation = aberrationOrientation(position, center);
+                    orientation = internal_coma*M_PI + aberrationOrientation(position, center);
                     if (lens_scale > 0){
                         size = aberrationSizeFromLens(position, lens, lens_scale, lens_offset, strength, width, height, lens_width, lens_height);
                     }
@@ -195,16 +252,16 @@ double* generate(double* input, int samples, double exposure, int aberration, do
             }
         }
         else{
-            int maxSamples = samples*(x_max-x_min)*(y_max-y_min);
+            int maxSamples = 3*samples*(x_max-x_min)*(y_max-y_min);
             for(int p = 0; p < 100; p++){
                 printf("\b\b\b\b\b%3d %%", (100*p/100+1) );
                 for(int s = 0; s < maxSamples/100; s++){
                     position[0] = x_min + floor(randomNumber()*(x_max-x_min-1));
                     position[1] = y_min +  floor(randomNumber()*(y_max-y_min-1));
-                    for(int i = 0; i < 3; i++){
-                        rgb[i] = arrayValue(input, (int)position[0], (int)position[1], i, width);
-                    }
-                    orientation = aberrationOrientation(position, center);
+                    int rgb_ch = floor(randomNumber()*3);
+                    rgb[0] = 0; rgb[1] = 0; rgb[2] = 0;
+                    rgb[rgb_ch] = arrayValue(input, (int)position[0], (int)position[1], rgb_ch, width);
+                    orientation = internal_coma*M_PI + aberrationOrientation(position, center);
                     if (lens_scale > 0){
                         size = aberrationSizeFromLens(position, lens, lens_scale, lens_offset, strength, width, height, lens_width, lens_height);
                     }
@@ -216,8 +273,10 @@ double* generate(double* input, int samples, double exposure, int aberration, do
                 }
             }
         }
-        
         printf("\n");
+        ftime(&t_end);
+        t_elapsed = (uint64_t) (1000.0 * (t_end.time - t_start.time) + (t_end.millitm - t_start.millitm));
+        printTime(t_elapsed);
     }
     else{
         for(int x = x_min; x < x_max; x++){
@@ -239,7 +298,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
                     output[i] = 1;
                 }
             }
-            printf("Dark current noise added.\n");
+            printf("Dark current noise applied.\n");
         }
 
         if (readoutNoise > 0){
@@ -254,7 +313,7 @@ double* generate(double* input, int samples, double exposure, int aberration, do
                 }
                 
             }
-            printf("Readout noise added.\n");
+            printf("Readout noise applied.\n");
         }
     }
     else{
@@ -292,8 +351,5 @@ double* generate(double* input, int samples, double exposure, int aberration, do
             printf("Readout noise added.\n");
         }
     }
-
-    
-
     return output;
 }

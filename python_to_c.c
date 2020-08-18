@@ -1879,7 +1879,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
  *     aberration_int = 0
  *     if aberration == 'coma':             # <<<<<<<<<<<<<<
  *         aberration_int = 0
- *     elif aberration == 'astigmatism_tangential':
+ *     elif aberration == 'astigmatism_sagittal':
  */
   __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_aberration, __pyx_n_s_coma, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 9, __pyx_L1_error)
   if (__pyx_t_1) {
@@ -1888,7 +1888,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
  *     aberration_int = 0
  *     if aberration == 'coma':
  *         aberration_int = 0             # <<<<<<<<<<<<<<
- *     elif aberration == 'astigmatism_tangential':
+ *     elif aberration == 'astigmatism_sagittal':
  *         aberration_int = 1
  */
     __pyx_v_aberration_int = 0;
@@ -1898,7 +1898,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
  *     aberration_int = 0
  *     if aberration == 'coma':             # <<<<<<<<<<<<<<
  *         aberration_int = 0
- *     elif aberration == 'astigmatism_tangential':
+ *     elif aberration == 'astigmatism_sagittal':
  */
     goto __pyx_L3;
   }
@@ -1906,18 +1906,18 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   /* "python_to_c.pyx":11
  *     if aberration == 'coma':
  *         aberration_int = 0
- *     elif aberration == 'astigmatism_tangential':             # <<<<<<<<<<<<<<
+ *     elif aberration == 'astigmatism_sagittal':             # <<<<<<<<<<<<<<
  *         aberration_int = 1
- *     elif aberration == 'astigmatism_sagittal':
+ *     elif aberration == 'astigmatism_tangential':
  */
-  __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_aberration, __pyx_n_s_astigmatism_tangential, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_aberration, __pyx_n_s_astigmatism_sagittal, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 11, __pyx_L1_error)
   if (__pyx_t_1) {
 
     /* "python_to_c.pyx":12
  *         aberration_int = 0
- *     elif aberration == 'astigmatism_tangential':
- *         aberration_int = 1             # <<<<<<<<<<<<<<
  *     elif aberration == 'astigmatism_sagittal':
+ *         aberration_int = 1             # <<<<<<<<<<<<<<
+ *     elif aberration == 'astigmatism_tangential':
  *         aberration_int = 2
  */
     __pyx_v_aberration_int = 1;
@@ -1925,26 +1925,26 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
     /* "python_to_c.pyx":11
  *     if aberration == 'coma':
  *         aberration_int = 0
- *     elif aberration == 'astigmatism_tangential':             # <<<<<<<<<<<<<<
+ *     elif aberration == 'astigmatism_sagittal':             # <<<<<<<<<<<<<<
  *         aberration_int = 1
- *     elif aberration == 'astigmatism_sagittal':
+ *     elif aberration == 'astigmatism_tangential':
  */
     goto __pyx_L3;
   }
 
   /* "python_to_c.pyx":13
- *     elif aberration == 'astigmatism_tangential':
+ *     elif aberration == 'astigmatism_sagittal':
  *         aberration_int = 1
- *     elif aberration == 'astigmatism_sagittal':             # <<<<<<<<<<<<<<
+ *     elif aberration == 'astigmatism_tangential':             # <<<<<<<<<<<<<<
  *         aberration_int = 2
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)
  */
-  __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_aberration, __pyx_n_s_astigmatism_sagittal, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_aberration, __pyx_n_s_astigmatism_tangential, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 13, __pyx_L1_error)
   if (__pyx_t_1) {
 
     /* "python_to_c.pyx":14
  *         aberration_int = 1
- *     elif aberration == 'astigmatism_sagittal':
+ *     elif aberration == 'astigmatism_tangential':
  *         aberration_int = 2             # <<<<<<<<<<<<<<
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] lens = np.array(lens_file, dtype=np.float64)
@@ -1952,9 +1952,9 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
     __pyx_v_aberration_int = 2;
 
     /* "python_to_c.pyx":13
- *     elif aberration == 'astigmatism_tangential':
+ *     elif aberration == 'astigmatism_sagittal':
  *         aberration_int = 1
- *     elif aberration == 'astigmatism_sagittal':             # <<<<<<<<<<<<<<
+ *     elif aberration == 'astigmatism_tangential':             # <<<<<<<<<<<<<<
  *         aberration_int = 2
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)
  */
@@ -1962,7 +1962,7 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
   __pyx_L3:;
 
   /* "python_to_c.pyx":15
- *     elif aberration == 'astigmatism_sagittal':
+ *     elif aberration == 'astigmatism_tangential':
  *         aberration_int = 2
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] input = np.array(image_arr, dtype=np.float64)             # <<<<<<<<<<<<<<
  *     cdef cnp.ndarray[cnp.float64_t, ndim=1] lens = np.array(lens_file, dtype=np.float64)
@@ -2237,7 +2237,6 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
  *             for ch in range(0, 3):
  *                 image_arr[y*width*3 + x*3 + ch] = output_data[x*height*3 + y*3 + ch]             # <<<<<<<<<<<<<<
  *     return image_arr
- * 
  */
         __pyx_t_6 = PyNumber_Multiply(__pyx_v_x, __pyx_v_height); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 23, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
@@ -2300,8 +2299,6 @@ static PyObject *__pyx_f_11python_to_c_pass_to_c(PyObject *__pyx_v_image_arr, Py
  *             for ch in range(0, 3):
  *                 image_arr[y*width*3 + x*3 + ch] = output_data[x*height*3 + y*3 + ch]
  *     return image_arr             # <<<<<<<<<<<<<<
- * 
- * 
  */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_image_arr);
@@ -4704,7 +4701,7 @@ if (!__Pyx_RefNanny) {
 
   /* "python_to_c.pyx":1
  * import numpy as np             # <<<<<<<<<<<<<<
- * cimport numpy as cnp  #cython requires special numpy array
+ * cimport numpy as cnp
  * 
  */
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
