@@ -1,8 +1,1 @@
-how to build:
-
-python setup.py build_ext --inplace
-
-
-run:
-
-python run.py
+Full installation and usage instructions are available in OASIS_instructions.pdf
