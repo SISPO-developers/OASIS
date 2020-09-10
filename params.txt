@@ -1,9 +1,9 @@
 # general
-input_folder = C:/Users/name/OASIS/inputs
-output_folder = C:/Users/name/OASIS/outputs
+input_folder = C:/Users/maxim/OneDrive/University/Master/Helsinki/Project/EnVisS/blender_output
+output_folder = C:/Users/maxim/OneDrive/University/Master/Helsinki/Project/EnVisS/oasis_output
 lens_file = 0
 output_type = exr
-monochromatic_sensor = 0
+monochromatic_sensor = 1
 
 # render dimensions
 x_min = 0
@@ -12,7 +12,7 @@ y_min = 0
 y_max = 0
 
 # sample size
-samples = 1
+samples = 100
 exposure = 1
 
 # optical aberrations
@@ -22,8 +22,8 @@ chromatic_aberration = 0
 
 # image noise
 dark_current_noise = 0
-readout_noise = 0
-shot_noise = 0
+readout_noise = 5
+shot_noise = 1
 
 # distortion
 simulate_distortion = 0
